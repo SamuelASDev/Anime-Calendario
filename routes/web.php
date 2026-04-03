@@ -6,9 +6,10 @@ use App\Http\Controllers\AnimeController;
 use App\Http\Controllers\WatchPlanController;
 use App\Http\Controllers\Admin\WatchPlanAdminController;
 
+
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -38,7 +39,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/concluidos/{anime}/review', [WatchPlanController::class, 'storeReview'])
         ->name('completed.review.store');
-
     
 });
 
