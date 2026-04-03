@@ -16,25 +16,17 @@
                 </p>
             </div>
 
-            {{-- BLOCO TWITCH --}}
-            <div class="bg-[#9146FF] overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-purple-900">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg text-white font-bold mb-1 flex items-center">
-                            <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
-                            </svg>
-                            Acompanhe ao vivo!
-                        </h3>
-                        <p class="text-purple-100">
-                            As transmissões oficiais acontecem no canal do <strong>sapustristesdasilva</strong>.
-                        </p>
-                    </div>
-                    <a href="https://www.twitch.tv/sapustristesdasilva" target="_blank" 
-                       class="bg-white text-[#9146FF] font-bold py-2 px-4 rounded hover:bg-gray-100 transition duration-150">
-                        Assistir na Twitch
+            {{-- CANAL DA TWITCH --}}
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <h3 class="text-lg text-white font-semibold mb-2 flex items-center">
+                    <span class="mr-2">📺</span> Transmissões ao vivo
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Acompanhe nossas lives diretamente no canal: 
+                    <a href="https://www.twitch.tv/sapustristesdasilva" target="_blank" class="text-purple-400 hover:text-purple-300 font-medium underline">
+                        twitch.tv/sapustristesdasilva
                     </a>
-                </div>
+                </p>
             </div>
 
             {{-- AÇÕES RÁPIDAS --}}
