@@ -1,0 +1,296 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Anime;
+use App\Models\WatchPlan;
+use App\Models\WatchPlanDay;
+use App\Models\UserAnimeMeta;
+use Illuminate\Http\Request;
+
+class WatchPlanController extends Controller
+{
+    public function create(Anime $anime)
+    {
+        return view('watch-plans.create', compact('anime'));
+    }
+
+    public function store(Request $request, Anime $anime)
+    {
+        $request->validate([
+            'start_date' => ['required', 'date'],
+
+            'monday' => ['required', 'integer', 'min:0'],
+            'tuesday' => ['required', 'integer', 'min:0'],
+            'wednesday' => ['required', 'integer', 'min:0'],
+            'thursday' => ['required', 'integer', 'min:0'],
+            'friday' => ['required', 'integer', 'min:0'],
+            'saturday' => ['required', 'integer', 'min:0'],
+            'sunday' => ['required', 'integer', 'min:0'],
+            'episodes_watched' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $plan = WatchPlan::updateOrCreate(
+            ['anime_id' => $anime->id],
+            [
+                'episodes_watched' => $request->has('is_completed')
+                ? ($anime->episodes ?? $request->episodes_watched)
+                : $request->episodes_watched,
+                'start_date' => $request->start_date,
+                'watch_status' => $request->has('is_completed') ? 'concluido' : 'assistindo',
+            ]
+        );
+
+        $plan->days()->delete();
+
+        $daysMap = [
+            1 => [
+                'episodes_planned' => $request->monday,
+                'is_variable' => $request->has('monday_variable'),
+            ],
+            2 => [
+                'episodes_planned' => $request->tuesday,
+                'is_variable' => $request->has('tuesday_variable'),
+            ],
+            3 => [
+                'episodes_planned' => $request->wednesday,
+                'is_variable' => $request->has('wednesday_variable'),
+            ],
+            4 => [
+                'episodes_planned' => $request->thursday,
+                'is_variable' => $request->has('thursday_variable'),
+            ],
+            5 => [
+                'episodes_planned' => $request->friday,
+                'is_variable' => $request->has('friday_variable'),
+            ],
+            6 => [
+                'episodes_planned' => $request->saturday,
+                'is_variable' => $request->has('saturday_variable'),
+            ],
+            0 => [
+                'episodes_planned' => $request->sunday,
+                'is_variable' => $request->has('sunday_variable'),
+            ],
+        ];
+
+        foreach ($daysMap as $dayOfWeek => $data) {
+            WatchPlanDay::create([
+                'watch_plan_id' => $plan->id,
+                'day_of_week' => $dayOfWeek,
+                'episodes_planned' => $data['episodes_planned'],
+                'is_variable' => $data['is_variable'],
+            ]);
+        }
+
+        return redirect()->route('anime.search')->with('success', 'Plano criado com sucesso!');
+    }
+
+    public function generateSchedule($plan)
+    {
+        if (!$plan->anime) {
+            return [];
+        }
+
+        $startDate = \Carbon\Carbon::parse($plan->start_date)->startOfDay();
+        $today = request('test_date')
+        ? \Carbon\Carbon::parse(request('test_date'))
+        : \Carbon\Carbon::today();
+        $endDate = $today->copy()->addMonth();
+
+        $daysMap = $plan->days->keyBy('day_of_week');
+        $logsMap = $plan->logs->keyBy(function ($log) {
+            return \Carbon\Carbon::parse($log->watched_date)->format('Y-m-d');
+        });
+
+        $schedule = [];
+
+        // episódio base
+        $currentEpisode = $plan->episodes_watched + 1;
+
+        // começa do start_date, não de hoje
+        $date = $startDate->copy();
+
+        while ($date->lte($endDate)) {
+            $dateKey = $date->format('Y-m-d');
+            $dayOfWeek = $date->dayOfWeek;
+
+            $dayConfig = $daysMap[$dayOfWeek] ?? null;
+            $log = $logsMap[$dateKey] ?? null;
+
+            // se já passou do total de episódios, para
+            if (!empty($plan->anime->episodes) && $currentEpisode > $plan->anime->episodes) {
+                break;
+            }
+
+            $isPast = $date->lt($today);
+            $isTodayOrFuture = $date->gte($today);
+
+            // 1) se existe log, ele manda em tudo
+            if ($log) {
+                $episodesToday = (int) $log->episodes_watched_today;
+
+                if ($episodesToday > 0) {
+                    $from = $currentEpisode;
+                    $to = $currentEpisode + $episodesToday - 1;
+
+                    if (!empty($plan->anime->episodes)) {
+                        $to = min($to, $plan->anime->episodes);
+                    }
+
+                    if ($isTodayOrFuture) {
+                        $schedule[] = [
+                            'date' => $dateKey,
+                            'date_formatted' => $date->format('d/m/Y'),
+                            'anime_title' => $plan->anime->title,
+                            'anime_image' => $plan->anime->image,
+                            'label' => "Episódios: {$from} ao {$to}",
+                            'type' => 'logged',
+                            'notes' => $log->notes,
+                        ];
+                    }
+
+                    $currentEpisode += $episodesToday;
+                } else {
+                    if ($isTodayOrFuture) {
+                        $schedule[] = [
+                            'date' => $dateKey,
+                            'date_formatted' => $date->format('d/m/Y'),
+                            'anime_title' => $plan->anime->title,
+                            'anime_image' => $plan->anime->image,
+                            'label' => 'Sem episódios assistidos',
+                            'type' => 'logged',
+                            'notes' => $log->notes,
+                        ];
+                    }
+                }
+            }
+
+            // 2) sem log: usa a regra semanal
+            elseif ($dayConfig) {
+                // dia variável
+                if ($dayConfig->is_variable) {
+                    // passado sem log: não avança episódio
+                    // hoje/futuro: mostra "A definir"
+                    if ($isTodayOrFuture) {
+                        $schedule[] = [
+                            'date' => $dateKey,
+                            'date_formatted' => $date->format('d/m/Y'),
+                            'anime_title' => $plan->anime->title,
+                            'anime_image' => $plan->anime->image,
+                            'label' => "Ep atual: {$currentEpisode} - A definir",
+                            'type' => 'variable',
+                            'notes' => null,
+                        ];
+                    }
+                }
+
+                // dia fixo com episódios planejados
+                elseif ($dayConfig->episodes_planned > 0) {
+                    $episodesToday = (int) $dayConfig->episodes_planned;
+
+                    $from = $currentEpisode;
+                    $to = $currentEpisode + $episodesToday - 1;
+
+                    if (!empty($plan->anime->episodes)) {
+                        $to = min($to, $plan->anime->episodes);
+                    }
+
+                    if ($isTodayOrFuture) {
+                        $schedule[] = [
+                            'date' => $dateKey,
+                            'date_formatted' => $date->format('d/m/Y'),
+                            'anime_title' => $plan->anime->title,
+                            'anime_image' => $plan->anime->image,
+                            'label' => "Episódios: {$from} ao {$to}",
+                            'type' => 'planned',
+                            'notes' => null,
+                        ];
+                    }
+
+                    // mesmo em dia passado sem log, avança automaticamente
+                    $currentEpisode += $episodesToday;
+                }
+            }
+
+            $date->addDay();
+        }
+
+        return $schedule;
+    }
+
+    public function calendar()
+    {
+        $plans = \App\Models\WatchPlan::with('anime', 'days', 'logs')
+        ->where('watch_status', 'assistindo')
+        ->get();
+
+        $allSchedules = [];
+
+        foreach ($plans as $plan) {
+            $schedule = $this->generateSchedule($plan);
+
+            foreach ($schedule as $entry) {
+                $allSchedules[] = $entry;
+            }
+        }
+
+        usort($allSchedules, function ($a, $b) {
+            return strcmp($a['date'], $b['date']);
+        });
+
+        $calendarData = [];
+
+        foreach ($allSchedules as $entry) {
+            $calendarData[$entry['date_formatted']][] = $entry;
+        }
+
+        return view('calendar.index', compact('calendarData'));
+    }
+
+    public function completed()
+    {
+        $plans = \App\Models\WatchPlan::with([
+                'anime',
+                'logs',
+                'anime.userMeta.user'
+            ])
+            ->where('watch_status', 'concluido')
+            ->orderByDesc('updated_at')
+            ->paginate(12);
+
+        return view('completed.index', compact('plans'));
+    }
+
+    public function createReview(Anime $anime)
+    {
+        $anime->load('userMeta.user');
+
+        $myMeta = $anime->userMeta->firstWhere('user_id', auth()->id());
+
+        return view('completed.review', compact('anime', 'myMeta'));
+    }
+
+    public function storeReview(Request $request, Anime $anime)
+    {
+        $request->validate([
+            'rating' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'comment' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        UserAnimeMeta::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'anime_id' => $anime->id,
+            ],
+            [
+                'rating' => $request->rating,
+                'comment' => $request->comment,
+            ]
+        );
+
+        return redirect()->route('completed.animes')
+            ->with('success', 'Review salva com sucesso!');
+    }
+    
+}
