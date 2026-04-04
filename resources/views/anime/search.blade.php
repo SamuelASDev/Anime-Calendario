@@ -41,22 +41,39 @@
                         {{ $anime['status'] }}
                     </p>
 
-                    @if(auth()->user()?->role === 'admin')
-                        <form method="POST" action="{{ route('anime.store') }}" class="mt-2">
-                            @csrf
+                    <div class="mt-2 space-y-2">
+                        @if(auth()->user()?->role === 'admin')
+                            <form method="POST" action="{{ route('anime.store') }}">
+                                @csrf
+                                <input type="hidden" name="mal_id" value="{{ $anime['mal_id'] }}">
+                                <input type="hidden" name="title" value="{{ $anime['title'] }}">
+                                <input type="hidden" name="episodes" value="{{ $anime['episodes'] }}">
+                                <input type="hidden" name="synopsis" value="{{ $anime['synopsis'] }}">
+                                <input type="hidden" name="status" value="{{ $anime['status'] }}">
+                                <input type="hidden" name="image" value="{{ $anime['images']['jpg']['image_url'] }}">
+                                <input type="hidden" name="target" value="global">
 
+                                <button class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded w-full">
+                                    ➕ Adicionar ao geral
+                                </button>
+                            </form>
+                        @endif
+
+                        <form method="POST" action="{{ route('anime.store') }}">
+                            @csrf
                             <input type="hidden" name="mal_id" value="{{ $anime['mal_id'] }}">
                             <input type="hidden" name="title" value="{{ $anime['title'] }}">
                             <input type="hidden" name="episodes" value="{{ $anime['episodes'] }}">
                             <input type="hidden" name="synopsis" value="{{ $anime['synopsis'] }}">
                             <input type="hidden" name="status" value="{{ $anime['status'] }}">
                             <input type="hidden" name="image" value="{{ $anime['images']['jpg']['image_url'] }}">
+                            <input type="hidden" name="target" value="personal">
 
-                            <button class="bg-blue-500 hover:bg-blue-600 text-white text-sm sm:text-[10px] px-3 sm:px-2 py-2 sm:py-1 rounded w-full">
-                                ➕ Adicionar
+                            <button class="bg-purple-600 hover:bg-purple-700 text-white text-sm px-3 py-2 rounded w-full">
+                                👤 Adicionar ao meu espaço
                             </button>
                         </form>
-                    @endif
+                    </div>
                 </div>
             @endforeach
         </div>

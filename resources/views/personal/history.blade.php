@@ -8,10 +8,10 @@
         @endif
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-            <h1 class="text-xl sm:text-2xl font-bold">Histórico de episódios</h1>
+            <h1 class="text-xl sm:text-2xl font-bold">Meu Histórico</h1>
 
             <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <a href="{{ route('calendar') }}"
+                <a href="{{ route('personal.calendar') }}"
                    class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-white text-sm w-full sm:w-auto text-center">
                     Ver calendário
                 </a>
@@ -84,7 +84,7 @@
 
                                     <div class="mt-4 grid grid-cols-1 sm:flex gap-2">
                                         @if($item['can_confirm'])
-                                            <form method="POST" action="{{ route('history.confirm') }}" class="w-full sm:w-auto">
+                                            <form method="POST" action="{{ route('personal.history.confirm') }}" class="w-full sm:w-auto">
                                                 @csrf
                                                 <input type="hidden" name="plan_id" value="{{ $item['plan_id'] }}">
                                                 <input type="hidden" name="date" value="{{ $item['date'] }}">
@@ -97,7 +97,7 @@
                                                 </button>
                                             </form>
 
-                                            <form method="POST" action="{{ route('history.confirm') }}" class="w-full sm:w-auto">
+                                            <form method="POST" action="{{ route('personal.history.confirm') }}" class="w-full sm:w-auto">
                                                 @csrf
                                                 <input type="hidden" name="plan_id" value="{{ $item['plan_id'] }}">
                                                 <input type="hidden" name="date" value="{{ $item['date'] }}">

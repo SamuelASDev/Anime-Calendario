@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class WatchPlan extends Model
 {
     protected $fillable = [
+        'user_id',
         'anime_id',
         'episodes_watched',
         'episodes_per_day',
         'start_date',
         'watch_status',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function anime()
     {

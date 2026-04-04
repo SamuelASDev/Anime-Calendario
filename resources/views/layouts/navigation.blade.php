@@ -37,6 +37,52 @@
                             🛠 Admin
                         </x-nav-link>
                     @endif
+
+                    <!-- Meu Espaço Dropdown -->
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open"
+                            class="inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition">
+
+                            👤 Meu espaço
+
+                            <svg class="ms-1 h-4 w-4 transform transition-transform"
+                                :class="{ 'rotate-180': open }"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div x-show="open"
+                            @click.outside="open = false"
+                            x-transition
+                            class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
+
+                            <a href="{{ route('personal.calendar') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                📅 Meu calendário
+                            </a>
+
+                            <a href="{{ route('personal.history') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                📘 Meu histórico
+                            </a>
+
+                            <a href="{{ route('personal.completed') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                ⭐ Meus concluídos
+                            </a>
+
+                            <a href="{{ route('personal.animes.index') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                🎛 Gerenciar meus animes
+                            </a>
+
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
 
@@ -125,6 +171,36 @@
                     🛠 Admin
                 </x-responsive-nav-link>
             @endif
+
+                        <!-- Meu Espaço Mobile -->
+            <div x-data="{ openPersonal: false }">
+
+                <button @click="openPersonal = !openPersonal"
+                    class="w-full text-left px-3 py-2 text-white flex justify-between items-center">
+                    👤 Meu espaço
+                    <span x-text="openPersonal ? '−' : '+'"></span>
+                </button>
+
+                <div x-show="openPersonal" x-transition class="space-y-1">
+
+                    <x-responsive-nav-link :href="route('personal.calendar')">
+                        📅 Meu calendário
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('personal.history')">
+                        📘 Meu histórico
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('personal.completed')">
+                        ⭐ Meus concluídos
+                    </x-responsive-nav-link>
+
+                     <x-responsive-nav-link :href="route('personal.animes.index')">
+                        🎛 Gerenciar meus animes
+                    </x-responsive-nav-link>
+
+                </div>
+            </div>
         </div>
 
         <!-- Mobile User Info -->

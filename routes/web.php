@@ -5,7 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AnimeController;
 use App\Http\Controllers\WatchPlanController;
 use App\Http\Controllers\Admin\WatchPlanAdminController;
-
+use App\Http\Controllers\PersonalWatchPlanController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -45,6 +45,51 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/history/confirm', [WatchPlanController::class, 'confirm'])
         ->name('history.confirm');
+
+    Route::get('/me/calendar', [PersonalWatchPlanController::class, 'calendar'])
+    ->name('personal.calendar');
+
+    Route::get('/me/history', [PersonalWatchPlanController::class, 'history'])
+        ->name('personal.history');
+
+    Route::get('/me/completed', [PersonalWatchPlanController::class, 'completed'])
+        ->name('personal.completed');
+
+    Route::get('/me/watch-plans/create/{anime}', [PersonalWatchPlanController::class, 'create'])
+        ->name('personal.watch-plans.create');
+
+    Route::post('/me/watch-plans/store/{anime}', [PersonalWatchPlanController::class, 'store'])
+        ->name('personal.watch-plans.store');
+
+    Route::post('/me/history/confirm', [PersonalWatchPlanController::class, 'confirm'])
+        ->name('personal.history.confirm');
+
+    Route::get('/me/animes', [PersonalWatchPlanController::class, 'index'])
+    ->name('personal.animes.index');
+
+    Route::get('/me/animes/{plan}/edit', [PersonalWatchPlanController::class, 'edit'])
+        ->name('personal.animes.edit');
+
+    Route::put('/me/animes/{plan}', [PersonalWatchPlanController::class, 'update'])
+        ->name('personal.animes.update');
+
+    Route::get('/me/animes/{plan}/log', [PersonalWatchPlanController::class, 'createLog'])
+        ->name('personal.animes.log.create');
+
+    Route::post('/me/animes/{plan}/log', [PersonalWatchPlanController::class, 'storeLog'])
+        ->name('personal.animes.log.store');
+
+    Route::patch('/me/animes/{plan}/pause', [PersonalWatchPlanController::class, 'pause'])
+        ->name('personal.animes.pause');
+
+    Route::patch('/me/animes/{plan}/resume', [PersonalWatchPlanController::class, 'resume'])
+        ->name('personal.animes.resume');
+
+    Route::patch('/me/animes/{plan}/complete', [PersonalWatchPlanController::class, 'complete'])
+        ->name('personal.animes.complete');
+
+    Route::delete('/me/animes/{plan}', [PersonalWatchPlanController::class, 'destroy'])
+        ->name('personal.animes.destroy');
     
 });
 

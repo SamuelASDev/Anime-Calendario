@@ -22,6 +22,16 @@ class AnimeController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'mal_id' => ['required'],
+            'title' => ['required', 'string'],
+            'episodes' => ['nullable'],
+            'synopsis' => ['nullable'],
+            'status' => ['nullable'],
+            'image' => ['nullable'],
+            'target' => ['required', 'in:global,personal'],
+        ]);
+
         $anime = Anime::firstOrCreate(
             ['mal_id' => $request->mal_id],
             [
@@ -33,6 +43,12 @@ class AnimeController extends Controller
             ]
         );
 
-        return redirect()->route('watch-plans.create', $anime->id);
+        if ($request->target === 'global') {
+            abort_unless(auth()->user()?->role === 'admin', 403);
+
+            return redirect()->route('watch-plans.create', $anime->id);
+        }
+
+        return redirect()->route('personal.watch-plans.create', $anime->id);
     }
 }

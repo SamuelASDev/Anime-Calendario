@@ -222,8 +222,9 @@ class WatchPlanController extends Controller
     public function calendar()
     {
         $plans = \App\Models\WatchPlan::with('anime', 'days', 'logs')
-        ->where('watch_status', 'assistindo')
-        ->get();
+            ->whereNull('user_id')
+            ->where('watch_status', 'assistindo')
+            ->get();
 
         $allSchedules = [];
 
@@ -255,6 +256,7 @@ class WatchPlanController extends Controller
                 'logs',
                 'anime.userMeta.user'
             ])
+            ->whereNull('user_id')
             ->where('watch_status', 'concluido')
             ->orderByDesc('updated_at')
             ->paginate(12);
@@ -296,6 +298,7 @@ class WatchPlanController extends Controller
     public function history()
     {
         $plans = \App\Models\WatchPlan::with('anime', 'days', 'logs')
+            ->whereNull('user_id')
             ->where('watch_status', 'assistindo')
             ->get();
 

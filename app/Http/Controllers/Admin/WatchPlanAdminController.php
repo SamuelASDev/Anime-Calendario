@@ -13,6 +13,7 @@ class WatchPlanAdminController extends Controller
         $testDate = request('test_date');
 
         $plans = \App\Models\WatchPlan::with('anime', 'days', 'logs')
+            ->whereNull('user_id')
             ->orderByDesc('updated_at')
             ->get();
 
