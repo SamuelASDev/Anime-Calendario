@@ -321,7 +321,7 @@ class WatchPlanController extends Controller
                 return \Carbon\Carbon::parse($log->watched_date)->format('Y-m-d');
             });
 
-            $currentEpisode = $plan->episodes_watched + 1;
+            $currentEpisode = 1;
             $date = $startDate->copy();
 
             while ($date->lte($yesterday)) {
