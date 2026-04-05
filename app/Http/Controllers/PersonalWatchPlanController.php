@@ -221,7 +221,7 @@ class PersonalWatchPlanController extends Controller
 
     public function complete(WatchPlan $plan)
     {
-        $plan = WatchPlan::with('anime')
+        $plan = WatchPlan::with('anime', 'logs')
             ->where('id', $plan->id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
@@ -229,6 +229,28 @@ class PersonalWatchPlanController extends Controller
         $lastEpisode = $plan->anime->episodes;
 
         if ($lastEpisode !== null) {
+            $currentWatched = (int) $plan->episodes_watched;
+            $lastEpisode = (int) $lastEpisode;
+
+            $episodesWatchedToday = $lastEpisode - $currentWatched;
+
+            if ($episodesWatchedToday > 0) {
+                $today = \Carbon\Carbon::today()->format('Y-m-d');
+
+                $log = $plan->logs()->firstOrNew([
+                    'watched_date' => $today,
+                ]);
+
+                $alreadyLoggedToday = (int) ($log->episodes_watched_today ?? 0);
+                $log->episodes_watched_today = $alreadyLoggedToday + $episodesWatchedToday;
+
+                if (empty($log->notes)) {
+                    $log->notes = 'Anime concluído manualmente.';
+                }
+
+                $log->save();
+            }
+
             $plan->episodes_watched = $lastEpisode;
         }
 
