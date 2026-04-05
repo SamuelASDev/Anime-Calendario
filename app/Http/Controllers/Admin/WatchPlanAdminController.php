@@ -31,11 +31,9 @@ class WatchPlanAdminController extends Controller
             if ($isFinishedByEpisodes && $plan->watch_status !== 'concluido') {
                 \App\Models\WatchPlan::where('id', $plan->id)->update([
                     'watch_status' => 'concluido',
-                    'episodes_watched' => $totalEpisodes,
                 ]);
 
                 $plan->watch_status = 'concluido';
-                $plan->episodes_watched = $totalEpisodes;
                 $plan->current_episode_calculated = $totalEpisodes;
             }
 
@@ -247,10 +245,26 @@ class WatchPlanAdminController extends Controller
 
     public function complete(\App\Models\WatchPlan $plan)
     {
-        $lastEpisode = $plan->anime->episodes;
+        $plan->load('anime', 'days', 'logs');
 
-        if ($lastEpisode !== null) {
-            $plan->episodes_watched = $lastEpisode;
+        $totalEpisodes = $plan->anime->episodes;
+
+        if ($totalEpisodes !== null) {
+            $currentEpisode = $this->calculateCurrentEpisode($plan);
+            $remainingEpisodes = max(0, $totalEpisodes - $currentEpisode);
+
+            if ($remainingEpisodes > 0) {
+                $today = now()->format('Y-m-d');
+
+                $log = \App\Models\WatchLog::firstOrNew([
+                    'watch_plan_id' => $plan->id,
+                    'watched_date' => $today,
+                ]);
+
+                $log->episodes_watched_today = (int) ($log->episodes_watched_today ?? 0) + $remainingEpisodes;
+                $log->notes = trim(($log->notes ? $log->notes . ' | ' : '') . 'Anime concluído manualmente.');
+                $log->save();
+            }
         }
 
         $plan->watch_status = 'concluido';

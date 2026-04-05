@@ -33,11 +33,9 @@ class PersonalWatchPlanController extends Controller
             if ($isFinishedByEpisodes && $plan->watch_status !== 'concluido') {
                 $plan->update([
                     'watch_status' => 'concluido',
-                    'episodes_watched' => $totalEpisodes,
                 ]);
 
                 $plan->watch_status = 'concluido';
-                $plan->episodes_watched = $totalEpisodes;
                 $plan->current_episode_calculated = $totalEpisodes;
             }
 
@@ -221,15 +219,29 @@ class PersonalWatchPlanController extends Controller
 
     public function complete(WatchPlan $plan)
     {
-        $plan = WatchPlan::with('anime')
+        $plan = WatchPlan::with('anime', 'days', 'logs')
             ->where('id', $plan->id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        $lastEpisode = $plan->anime->episodes;
+        $totalEpisodes = $plan->anime->episodes;
 
-        if ($lastEpisode !== null) {
-            $plan->episodes_watched = $lastEpisode;
+        if ($totalEpisodes !== null) {
+            $currentEpisode = $this->calculateCurrentEpisode($plan);
+            $remainingEpisodes = max(0, $totalEpisodes - $currentEpisode);
+
+            if ($remainingEpisodes > 0) {
+                $today = now()->format('Y-m-d');
+
+                $log = WatchLog::firstOrNew([
+                    'watch_plan_id' => $plan->id,
+                    'watched_date' => $today,
+                ]);
+
+                $log->episodes_watched_today = (int) ($log->episodes_watched_today ?? 0) + $remainingEpisodes;
+                $log->notes = trim(($log->notes ? $log->notes . ' | ' : '') . 'Anime concluído manualmente.');
+                $log->save();
+            }
         }
 
         $plan->watch_status = 'concluido';
@@ -238,7 +250,6 @@ class PersonalWatchPlanController extends Controller
         return redirect()->route('personal.animes.index')
             ->with('success', 'Anime marcado como concluído.');
     }
-
     public function destroy(WatchPlan $plan)
     {
         $plan = WatchPlan::where('id', $plan->id)
