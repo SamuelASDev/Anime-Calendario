@@ -247,37 +247,12 @@ class WatchPlanAdminController extends Controller
 
     public function complete(\App\Models\WatchPlan $plan)
     {
-        if (!$plan->anime || !$plan->anime->episodes) {
-            return redirect()->route('admin.animes.index')
-                ->with('error', 'Esse anime não tem total de episódios definido.');
+        $lastEpisode = $plan->anime->episodes;
+
+        if ($lastEpisode !== null) {
+            $plan->episodes_watched = $lastEpisode;
         }
 
-        $lastEpisode = (int) $plan->anime->episodes;
-        $currentWatched = (int) $plan->episodes_watched;
-
-        // Quantos episódios faltavam para concluir
-        $episodesWatchedToday = $lastEpisode - $currentWatched;
-
-        // Evita valor negativo ou zero sem necessidade
-        if ($episodesWatchedToday > 0) {
-            $today = \Carbon\Carbon::today()->format('Y-m-d');
-
-            $log = $plan->logs()->firstOrNew([
-                'watched_date' => $today,
-            ]);
-
-            // Se já existir log hoje, soma com o que já tinha
-            $alreadyLoggedToday = (int) ($log->episodes_watched_today ?? 0);
-            $log->episodes_watched_today = $alreadyLoggedToday + $episodesWatchedToday;
-
-            if (empty($log->notes)) {
-                $log->notes = 'Anime concluído manualmente.';
-            }
-
-            $log->save();
-        }
-
-        $plan->episodes_watched = $lastEpisode;
         $plan->watch_status = 'concluido';
         $plan->save();
 
