@@ -300,7 +300,7 @@ class PersonalWatchPlanController extends Controller
     {
         $plans = WatchPlan::with('anime', 'days', 'logs')
             ->where('user_id', auth()->id())
-            ->where('watch_status', 'assistindo')
+            ->whereIn('watch_status', ['assistindo', 'concluido'])
             ->get();
 
         $allHistory = [];
@@ -333,7 +333,7 @@ class PersonalWatchPlanController extends Controller
                 $log = $logsMap[$dateKey] ?? null;
 
                 if (!empty($plan->anime->episodes) && $currentEpisode > $plan->anime->episodes) {
-                    break;
+                    $currentEpisode = $plan->anime->episodes;
                 }
 
                 if ($log) {
