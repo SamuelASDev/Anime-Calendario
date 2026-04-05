@@ -344,7 +344,7 @@ class PersonalWatchPlanController extends Controller
                 $log = $logsMap[$dateKey] ?? null;
 
                 if (!empty($plan->anime->episodes) && $currentEpisode > $plan->anime->episodes) {
-                    $currentEpisode = $plan->anime->episodes;
+                        break;
                 }
 
                 if ($log) {

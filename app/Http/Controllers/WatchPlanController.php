@@ -332,7 +332,7 @@ class WatchPlanController extends Controller
                 $log = $logsMap[$dateKey] ?? null;
 
                 if (!empty($plan->anime->episodes) && $currentEpisode > $plan->anime->episodes) {
-                    $currentEpisode = $plan->anime->episodes;
+                        break;
                 }
 
                 // 1) Se existe log, ele manda
