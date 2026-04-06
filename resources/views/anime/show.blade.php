@@ -6,13 +6,6 @@
                class="text-sm text-gray-400 hover:text-white transition">
                 ← Voltar
             </a>
-
-            @auth
-                <a href="{{ route('anime.synopsis.edit', $anime->id) }}"
-                   class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition">
-                    Editar sinopse
-                </a>
-            @endauth
         </div>
 
         @if(session('success'))
