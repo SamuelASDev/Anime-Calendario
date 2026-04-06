@@ -238,4 +238,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('admin.animes.destroy');
 });
 
+// Adicione isso no routes/web.php
+Route::get('/link-storage', function () {
+    Artisan::call('storage:link');
+    return 'Pasta Storage conectada com sucesso!';
+});
+
+
 require __DIR__ . '/auth.php';
