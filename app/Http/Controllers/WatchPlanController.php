@@ -261,7 +261,12 @@ class WatchPlanController extends Controller
             ->orderByDesc('updated_at')
             ->paginate(12);
 
-        return view('completed.index', compact('plans'));
+        $myCompletedAnimeIds = \App\Models\WatchPlan::where('user_id', auth()->id())
+        ->where('watch_status', 'concluido')
+        ->pluck('anime_id')
+        ->toArray();
+
+        return view('completed.index', compact('plans', 'myCompletedAnimeIds'));
     }
 
     public function createReview(Anime $anime)
@@ -467,6 +472,26 @@ class WatchPlanController extends Controller
             ->with('success', $request->action === 'missed'
                 ? 'Dia marcado como não assistido.'
                 : 'Episódios confirmados com sucesso.');
+    }
+
+    public function markAsWatched(Anime $anime)
+    {
+        \App\Models\WatchPlan::updateOrCreate(
+            [
+                'anime_id' => $anime->id,
+                'user_id' => auth()->id(),
+            ],
+            [
+                'episodes_watched' => $anime->episodes ?? 0,
+                'episodes_per_day' => 0,
+                'start_date' => now()->toDateString(),
+                'watch_status' => 'concluido',
+            ]
+        );
+
+        return redirect()
+            ->route('completed.review.create', $anime->id)
+            ->with('success', 'Anime adicionado aos seus concluídos. Agora você já pode fazer sua review!');
     }
         
 }

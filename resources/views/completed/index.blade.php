@@ -64,12 +64,22 @@
                                     {{ $averageRating ? $averageRating . '/10' : 'Sem notas ainda' }}
                                 </p>
                             </div>
-
+                            
                             <div class="mt-4">
-                                <a href="{{ route('completed.review.create', $plan->anime->id) }}"
-                                class="inline-block bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white text-sm">
-                                    Fazer review
-                                </a>
+                                @if(in_array($plan->anime->id, $myCompletedAnimeIds ?? []))
+                                    <a href="{{ route('completed.review.create', $plan->anime->id) }}"
+                                    class="inline-block bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white text-sm">
+                                        Fazer review
+                                    </a>
+                                @else
+                                    <form method="POST" action="{{ route('completed.mark-watched', $plan->anime->id) }}">
+                                        @csrf
+                                        <button type="submit"
+                                                class="inline-block bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white text-sm">
+                                            Já assisti
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
 
                         @php
