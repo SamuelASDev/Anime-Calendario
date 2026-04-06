@@ -30,6 +30,8 @@ class User extends Authenticatable
         'show_favorites_public',
         'show_top10_public',
         'show_reviews_public',
+        'profile_photo',
+        'profile_banner',
     ];
 
     /**
@@ -58,5 +60,19 @@ class User extends Authenticatable
     public function animeMeta()
     {
         return $this->hasMany(\App\Models\UserAnimeMeta::class);
+    }
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->profile_photo
+            ? asset('storage/' . $this->profile_photo)
+            : null;
+    }
+
+    public function getProfileBannerUrlAttribute()
+    {
+        return $this->profile_banner
+            ? asset('storage/' . $this->profile_banner)
+            : null;
     }
 }

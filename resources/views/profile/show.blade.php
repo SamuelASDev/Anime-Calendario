@@ -1,64 +1,76 @@
 <x-app-layout>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-white">
         {{-- Header do perfil --}}
-        <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 shadow-2xl mb-8">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.18),transparent_35%)]"></div>
+        <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl mb-8">
+            {{-- Banner --}}
+            <div class="relative h-48 sm:h-56 lg:h-72 w-full">
+                @if($user->profile_banner)
+                    <img src="{{ asset('storage/' . $user->profile_banner) }}" alt="Banner de {{ $user->name }}" class="h-full w-full object-cover">
+                @endif
 
-            <div class="relative p-6 sm:p-8 lg:p-10">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div class="absolute inset-0 bg-black/35"></div>
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.20),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.20),transparent_35%)]"></div>
+            </div>
+
+            <div class="relative px-6 sm:px-8 lg:px-10 pb-8">
+                <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 -mt-12 sm:-mt-16">
                     <div class="min-w-0">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-2xl font-bold shadow-lg">
-                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                        <div class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5">
+                            {{-- Foto de perfil --}}
+                            <div class="shrink-0">
+                                @if($user->profile_photo)
+                                    <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Foto de {{ $user->name }}" class="h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32 rounded-3xl object-cover border-4 border-zinc-900 shadow-2xl bg-zinc-800">
+                                @else
+                                    <div class="h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32 rounded-3xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-3xl sm:text-4xl font-bold shadow-2xl border-4 border-zinc-900">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                    </div>
+                                @endif
                             </div>
-
-                            <div class="min-w-0">
-                                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight break-words">
+                            {{-- Aumentei o pt-6 para pt-14 e sm:pt-4 para sm:pt-16 para o nome descer --}}
+                            <div class="min-w-0 pt-14 sm:pt-16">
+                                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight break-words drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
                                     {{ $user->name }}
                                 </h1>
-                                <p class="text-sm sm:text-base text-zinc-300 break-all">
+
+                                <p class="text-sm sm:text-base text-zinc-400 break-all mt-1 font-medium drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
                                     {{ '@' . $user->username }}
                                 </p>
+
+                                @if($user->bio)
+                                    <p class="mt-4 max-w-3xl text-sm sm:text-base text-zinc-200 leading-relaxed whitespace-pre-line drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+                                        {{ $user->bio }}
+                                    </p>
+                                @endif
                             </div>
                         </div>
-
-                        @if($user->bio)
-                            <p class="mt-4 max-w-3xl text-sm sm:text-base text-zinc-200 leading-relaxed whitespace-pre-line">
-                                {{ $user->bio }}
-                            </p>
-                        @else
-                            <p class="mt-4 text-sm text-zinc-400 italic">
-                                Este usuário ainda não adicionou uma bio.
-                            </p>
-                        @endif
                     </div>
 
+                    {{-- Stats - Adicionado ring-1 e border-white/20 para o contorno --}}
                     <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:w-[320px]">
                         @if($user->show_favorites_public)
-                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-                                <p class="text-xs uppercase tracking-widest text-zinc-400">Favoritos</p>
-                                <p class="mt-1 text-2xl font-extrabold text-yellow-300">{{ $favorites->count() }}</p>
+                            <div class="rounded-2xl border border-white/20 bg-white/5 backdrop-blur-md p-4 text-center ring-1 ring-white/10 shadow-inner">
+                                <p class="text-xs uppercase tracking-widest text-zinc-400 font-bold">Favoritos</p>
+                                <p class="mt-1 text-2xl font-extrabold text-yellow-300 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{{ $favorites->count() }}</p>
                             </div>
                         @endif
 
                         @if($user->show_watching_public)
-                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-                                <p class="text-xs uppercase tracking-widest text-zinc-400">Assistindo</p>
-                                <p class="mt-1 text-2xl font-extrabold text-blue-300">{{ $watching->count() }}</p>
+                            <div class="rounded-2xl border border-white/20 bg-white/5 backdrop-blur-md p-4 text-center ring-1 ring-white/10 shadow-inner">
+                                <p class="text-xs uppercase tracking-widest text-zinc-400 font-bold">Assistindo</p>
+                                <p class="mt-1 text-2xl font-extrabold text-blue-300 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{{ $watching->count() }}</p>
                             </div>
                         @endif
 
                         @if($user->show_completed_public)
-                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-center">
-                                <p class="text-xs uppercase tracking-widest text-zinc-400">Concluídos</p>
-                                <p class="mt-1 text-2xl font-extrabold text-green-300">{{ $completed->count() }}</p>
+                            <div class="rounded-2xl border border-white/20 bg-white/5 backdrop-blur-md p-4 text-center ring-1 ring-white/10 shadow-inner">
+                                <p class="text-xs uppercase tracking-widest text-zinc-400 font-bold">Concluídos</p>
+                                <p class="mt-1 text-2xl font-extrabold text-green-300 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">{{ $completed->count() }}</p>
                             </div>
                         @endif
                     </div>
                 </div>
             </div>
         </div>
-
         {{-- Top 10 --}}
         @if($user->show_top10_public && $top10->count())
             <section class="mb-8">

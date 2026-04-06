@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -71,7 +72,25 @@ class ProfileController extends Controller
             'show_favorites_public' => ['nullable', 'boolean'],
             'show_top10_public' => ['nullable', 'boolean'],
             'show_reviews_public' => ['nullable', 'boolean'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'profile_banner' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
+
+        if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $data['profile_photo'] = $request->file('profile_photo')->store('profiles/photos', 'public');
+        }
+
+        if ($request->hasFile('profile_banner')) {
+            if ($user->profile_banner && Storage::disk('public')->exists($user->profile_banner)) {
+                Storage::disk('public')->delete($user->profile_banner);
+            }
+
+            $data['profile_banner'] = $request->file('profile_banner')->store('profiles/banners', 'public');
+        }
 
         $user->update([
             'username' => $data['username'],
@@ -82,6 +101,8 @@ class ProfileController extends Controller
             'show_favorites_public' => $request->boolean('show_favorites_public'),
             'show_top10_public' => $request->boolean('show_top10_public'),
             'show_reviews_public' => $request->boolean('show_reviews_public'),
+            'profile_photo' => $data['profile_photo'] ?? $user->profile_photo,
+            'profile_banner' => $data['profile_banner'] ?? $user->profile_banner,
         ]);
 
         return redirect()->route('profile.edit')->with('success', 'Perfil público atualizado com sucesso.');
