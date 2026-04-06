@@ -93,7 +93,9 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/anime/{anime}/synopsis', [AnimeController::class, 'updateSynopsis'])
         ->whereNumber('anime')
         ->name('anime.synopsis.update');
-
+    
+    Route::post('/concluidos/{anime}/ja-assisti', [WatchPlanController::class, 'markAsWatched'])
+        ->name('completed.mark-watched');
     /*
     |--------------------------------------------------------------------------
     | Watch plans globais

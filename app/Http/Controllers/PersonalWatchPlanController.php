@@ -688,4 +688,5 @@ class PersonalWatchPlanController extends Controller
         return redirect()->route('personal.completed')
             ->with('success', 'Review salva com sucesso!');
     }
+
 }
