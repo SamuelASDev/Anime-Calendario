@@ -72,11 +72,19 @@
                                         </p>
                                     </div>
 
-                                    <div class="mt-3">
+                                    <div class="mt-3 flex flex-wrap gap-2">
                                         <a href="{{ route('anime.show', $plan->anime->id) }}"
-                                           class="inline-flex items-center rounded bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 text-xs font-medium transition">
+                                        class="inline-flex items-center rounded bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 text-xs font-medium transition">
                                             Ver anime
                                         </a>
+
+                                        <form method="POST" action="{{ route('personal.watch-plans.follow', $plan->id) }}">
+                                            @csrf
+                                            <button type="submit"
+                                                class="inline-flex items-center rounded bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 text-xs font-medium transition">
+                                                Acompanhar
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

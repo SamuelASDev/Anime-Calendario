@@ -689,4 +689,76 @@ class PersonalWatchPlanController extends Controller
             ->with('success', 'Review salva com sucesso!');
     }
 
+    public function followFromGlobal(WatchPlan $plan)
+    {
+        $plan->load('anime', 'days', 'logs');
+
+        abort_if($plan->user_id !== null, 404);
+
+        if (!$plan->anime) {
+            return redirect()->back()->with('error', 'Anime não encontrado.');
+        }
+
+        $today = now()->startOfDay();
+
+        $daysMap = $plan->days->keyBy('day_of_week');
+        $logsMap = $plan->logs->keyBy(function ($log) {
+            return \Carbon\Carbon::parse($log->watched_date)->format('Y-m-d');
+        });
+
+        $currentEpisode = (int) $plan->episodes_watched;
+        $date = \Carbon\Carbon::parse($plan->start_date)->startOfDay();
+
+        while ($date->lt($today)) {
+            $dateKey = $date->format('Y-m-d');
+            $dayOfWeek = $date->dayOfWeek;
+
+            $dayConfig = $daysMap[$dayOfWeek] ?? null;
+            $log = $logsMap[$dateKey] ?? null;
+
+            if ($log) {
+                $currentEpisode += (int) $log->episodes_watched_today;
+            } elseif ($dayConfig) {
+                if (!$dayConfig->is_variable && (int) $dayConfig->episodes_planned > 0) {
+                    $currentEpisode += (int) $dayConfig->episodes_planned;
+                }
+            }
+
+            if (!empty($plan->anime->episodes) && $currentEpisode >= $plan->anime->episodes) {
+                $currentEpisode = (int) $plan->anime->episodes;
+                break;
+            }
+
+            $date->addDay();
+        }
+
+        $personalPlan = WatchPlan::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'anime_id' => $plan->anime_id,
+            ],
+            [
+                'episodes_watched' => $currentEpisode,
+                'start_date' => $today->format('Y-m-d'),
+                'watch_status' => $currentEpisode >= (int) ($plan->anime->episodes ?? PHP_INT_MAX)
+                    ? 'concluido'
+                    : 'assistindo',
+            ]
+        );
+
+        $personalPlan->days()->delete();
+
+        foreach ($plan->days as $day) {
+            WatchPlanDay::create([
+                'watch_plan_id' => $personalPlan->id,
+                'day_of_week' => $day->day_of_week,
+                'episodes_planned' => $day->episodes_planned,
+                'is_variable' => $day->is_variable,
+            ]);
+        }
+
+        return redirect()->route('personal.animes.index')
+            ->with('success', 'Anime adicionado ao seu espaço no mesmo estágio atual!');
+    }
+
 }
