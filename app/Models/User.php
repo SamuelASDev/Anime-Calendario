@@ -65,14 +65,14 @@ class User extends Authenticatable
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo
-            ? asset('storage/' . $this->profile_photo)
+            ? asset('public/storage/' . $this->profile_photo)
             : null;
     }
 
     public function getProfileBannerUrlAttribute()
     {
         return $this->profile_banner
-            ? asset('storage/' . $this->profile_banner)
+            ? asset('public/storage/' . $this->profile_banner)
             : null;
     }
 }
