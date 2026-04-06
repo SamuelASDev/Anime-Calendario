@@ -174,6 +174,10 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                     @foreach($watching as $plan)
+                        @php
+                            $myMeta = $plan->anime->userMeta->firstWhere('user_id', auth()->id());
+                        @endphp
+
                         <div class="rounded-2xl border border-white/10 bg-zinc-900 overflow-hidden shadow-lg flex">
                             <img
                                 src="{{ $plan->anime->image }}"
@@ -181,19 +185,49 @@
                                 class="w-24 sm:w-28 h-auto object-cover shrink-0"
                             >
 
-                            <div class="p-4 min-w-0 flex-1">
-                                <h3 class="font-bold text-base break-words leading-snug">
-                                    {{ $plan->anime->title }}
-                                </h3>
+                            <div class="p-4 min-w-0 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h3 class="font-bold text-base break-words leading-snug">
+                                        {{ $plan->anime->title }}
+                                    </h3>
 
-                                <p class="mt-2 text-sm text-zinc-400">
-                                    Status: assistindo
-                                </p>
-
-                                @if(!empty($plan->anime->episodes))
-                                    <p class="text-sm text-zinc-400">
-                                        Episódios: {{ $plan->anime->episodes }}
+                                    <p class="mt-2 text-sm text-zinc-400">
+                                        Status: assistindo
                                     </p>
+
+                                    @if(!empty($plan->anime->episodes))
+                                        <p class="text-sm text-zinc-400">
+                                            Episódios: {{ $plan->anime->episodes }}
+                                        </p>
+                                    @endif
+                                </div>
+
+                                @if(auth()->check() && auth()->id() === $user->id)
+                                    <div class="flex gap-2 mt-3 flex-wrap">
+                                        {{-- FAVORITO --}}
+                                        <form method="POST" action="{{ route('personal.animes.favorite', $plan->anime->id) }}">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <button
+                                                class="px-2 py-1 text-xs rounded
+                                                {{ $myMeta && $myMeta->is_favorite ? 'bg-yellow-500 text-black' : 'bg-gray-700 hover:bg-gray-600' }}">
+                                                
+                                                {{ $myMeta && $myMeta->is_favorite ? '★ Favorito' : '☆ Favoritar' }}
+                                            </button>
+                                        </form>
+
+                                        {{-- ADD TOP 10 --}}
+                                        <form method="POST" action="{{ route('personal.animes.addTop', $plan->anime->id) }}">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <button
+                                                class="px-2 py-1 text-xs rounded bg-violet-600 hover:bg-violet-700">
+                                                ➕ Top
+                                            </button>
+                                        </form>
+                                    </div>
                                 @endif
                             </div>
                         </div>
