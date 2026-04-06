@@ -8,8 +8,9 @@ use App\Http\Controllers\Admin\WatchPlanAdminController;
 use App\Http\Controllers\PersonalWatchPlanController;
 
 Route::get('/', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return view('welcome');
+})->name('home');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
