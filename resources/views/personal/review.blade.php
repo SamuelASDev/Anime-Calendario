@@ -49,12 +49,6 @@
                             Status: {{ $anime->anime_status }}
                         </p>
                     @endif
-
-                    @if($anime->synopsis)
-                        <p class="text-sm text-gray-300 line-clamp-4">
-                            {{ $anime->synopsis }}
-                        </p>
-                    @endif
                 </div>
 
             </div>
@@ -98,9 +92,8 @@
                        class="text-sm text-gray-400 hover:text-white">
                         ← Voltar
                     </a>
-
                     <button type="submit"
-                            class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold">
+                            class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white font-semibold">
                         Salvar review
                     </button>
 
