@@ -240,30 +240,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 use Illuminate\Support\Facades\Artisan;
 
-Route::get('/arruma-hostinger', function () {
-    // 1. Definir os caminhos
-    // Onde os arquivos estão de verdade
-    $target = storage_path('app/public'); 
-    
-    // Onde o atalho deve aparecer para o navegador ler
-    $shortcut = public_path('storage'); 
 
-    // 2. Limpar caches que não dependem de 'exec'
-    Artisan::call('config:clear');
-    Artisan::call('cache:clear');
-    Artisan::call('view:clear');
-
-    // 3. Criar o link simbólico manualmente
-    if (file_exists($shortcut)) {
-        return "O atalho 'storage' já existe. Se as imagens não aparecem, apague a PASTA 'storage' que está dentro da sua pasta 'public' via Gerenciador de Arquivos e rode essa rota de novo.";
-    }
-
-    if (symlink($target, $shortcut)) {
-        return "Sucesso! Link simbólico criado manualmente e caches limpos.";
-    } else {
-        return "Erro ao criar link manual. Verifique as permissões das pastas.";
-    }
-});
 
 
 require __DIR__ . '/auth.php';
