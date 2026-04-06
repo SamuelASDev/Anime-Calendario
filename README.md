@@ -8,11 +8,22 @@
 Sistema completo para organizar, acompanhar e avaliar animes 📺
 </p>
 
+<p align="center">
+  <a href="https://animetracker.froglabs.site" target="_blank">
+    <img src="https://img.shields.io/badge/Live%20Demo-Visitar%20Site-00D084?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website">
+  </a>
+  <a href="https://www.twitch.tv/sapustristesdasilva" target="_blank">
+    <img src="https://img.shields.io/badge/Twitch-sapustristesdasilva-9146FF?style=for-the-badge&logo=twitch&logoColor=white" alt="Twitch Channel">
+  </a>
+</p>
+
 ---
 
 ## 🚀 Sobre o projeto
 
 O **Anime Tracker** é um sistema web desenvolvido em Laravel que permite gerenciar o consumo de animes de forma inteligente, organizada e personalizada.
+
+🔗 **Acesse o sistema:** [https://animetracker.froglabs.site](https://animetracker.froglabs.site)
 
 A ideia do projeto é simular uma experiência parecida com plataformas como MyAnimeList, porém com foco em:
 
@@ -20,6 +31,13 @@ A ideia do projeto é simular uma experiência parecida com plataformas como MyA
 - controle de progresso 📊  
 - planejamento semanal 🎯  
 - avaliações personalizadas ⭐  
+
+---
+
+## 📺 Onde assistir (Lives)
+
+As transmissões de desenvolvimento e uso do sistema acontecem oficialmente no canal:
+👉 **[twitch.tv/sapustristesdasilva](https://www.twitch.tv/sapustristesdasilva)**
 
 ---
 
@@ -109,7 +127,7 @@ Com navegação dinâmica no painel.
 
 ```bash
 # Clonar projeto
-git clone https://github.com/seu-user/seu-repo.git
+git clone [https://github.com/seu-user/seu-repo.git](https://github.com/seu-user/seu-repo.git)
 
 # Entrar na pasta
 cd seu-repo

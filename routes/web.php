@@ -39,6 +39,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/concluidos/{anime}/review', [WatchPlanController::class, 'storeReview'])
         ->name('completed.review.store');
+
+    Route::get('/history', [WatchPlanController::class, 'history'])
+        ->name('history');
+
+    Route::post('/history/confirm', [WatchPlanController::class, 'confirm'])
+        ->name('history.confirm');
     
 });
 

@@ -4,10 +4,20 @@
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-bold">Calendário Geral</h1>
 
-            <a href="{{ route('anime.search') }}"
-               class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">
-                Buscar animes
-            </a>
+
+
+
+            <div class="flex gap-3">
+                <a href="{{ route('history') }}"
+                class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white text-sm">
+                    Ver histórico
+                </a>
+
+                <a href="{{ route('anime.search') }}"
+                class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">
+                    Buscar animes
+                </a>
+            </div>
         </div>
 
         @forelse ($calendarData as $date => $items)

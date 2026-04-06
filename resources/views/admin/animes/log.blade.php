@@ -22,7 +22,7 @@
                     <input
                         type="date"
                         name="watched_date"
-                        value="{{ date('Y-m-d') }}"
+                        value="{{ old('watched_date', request('date', date('Y-m-d'))) }}"
                         class="w-full rounded bg-gray-200 border border-gray-600 px-3 py-2"
                         style="color: #111827 !important; -webkit-text-fill-color: #111827 !important;"
                     >

@@ -24,6 +24,10 @@
                         📅 Calendário
                     </x-nav-link>
 
+                    <x-nav-link :href="route('history')" :active="request()->routeIs('history')">
+                        🕒 Histórico
+                    </x-nav-link>
+
                     <x-nav-link :href="route('completed.animes')" :active="request()->routeIs('completed.animes')">
                         ✅ Concluídos
                     </x-nav-link>
@@ -106,6 +110,10 @@
 
             <x-responsive-nav-link :href="route('calendar')" :active="request()->routeIs('calendar')">
                 📅 Calendário
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('history')" :active="request()->routeIs('history')">
+                🕒 Histórico
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('completed.animes')" :active="request()->routeIs('completed.animes')">
