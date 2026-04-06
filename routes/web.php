@@ -239,9 +239,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 // Adicione isso no routes/web.php
-Route::get('/link-storage', function () {
+Route::get('/arruma-tudo', function() {
+    // Cria o link simbólico
     Artisan::call('storage:link');
-    return 'Pasta Storage conectada com sucesso!';
+    // Limpa o cache que pode estar travando o erro 500
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    return "Link criado e cache limpo!";
 });
 
 
