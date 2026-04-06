@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\JikanService;
 use Illuminate\Http\Request;
 use App\Models\Anime;
+use App\Services\TranslationService;
 
 class AnimeController extends Controller
 {
@@ -50,5 +51,16 @@ class AnimeController extends Controller
         }
 
         return redirect()->route('personal.watch-plans.create', $anime->id);
+    }
+
+    public function show(Anime $anime)
+    {
+        $anime->load([
+            'userMeta' => function ($query) {
+                $query->with('user')->latest();
+            }
+        ]);
+
+        return view('anime.show', compact('anime'));
     }
 }

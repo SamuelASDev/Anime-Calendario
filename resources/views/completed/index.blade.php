@@ -72,35 +72,43 @@
                                 </a>
                             </div>
 
-                            @if($plan->anime->userMeta->count())
-                                <div class="mt-4 border-t border-gray-700 pt-4">
-                                    <h3 class="text-sm font-semibold mb-2 text-blue-300">Reviews dos usuários</h3>
+                        @php
+                            $latestReview = $plan->anime->userMeta
+                                ->filter(fn ($meta) => $meta->rating || $meta->comment)
+                                ->sortByDesc('updated_at')
+                                ->first();
+                        @endphp
 
-                                    <div class="space-y-3">
-                                        @foreach($plan->anime->userMeta as $meta)
-                                            @if($meta->rating || $meta->comment)
-                                                <div class="bg-gray-900 border border-gray-700 rounded p-3">
-                                                    <p class="text-sm font-semibold text-white">
-                                                        {{ $meta->user->name }}
-                                                    </p>
+                        @if($latestReview)
+                            <div class="mt-4 border-t border-gray-700 pt-4">
+                                <h3 class="text-sm font-semibold mb-2 text-blue-300">Última review</h3>
 
-                                                    @if($meta->rating)
-                                                        <p class="text-sm text-yellow-300">
-                                                            Nota: {{ $meta->rating }}/10
-                                                        </p>
-                                                    @endif
+                                <div class="bg-gray-900 border border-gray-700 rounded p-3">
+                                    <p class="text-sm font-semibold text-white">
+                                        {{ $latestReview->user->name }}
+                                    </p>
 
-                                                    @if($meta->comment)
-                                                        <p class="text-sm text-gray-300 mt-1 break-words">
-                                                            {{ $meta->comment }}
-                                                        </p>
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        @endforeach
-                                    </div>
+                                    @if($latestReview->rating)
+                                        <p class="text-sm text-yellow-300">
+                                            Nota: {{ $latestReview->rating }}/10
+                                        </p>
+                                    @endif
+
+                                    @if($latestReview->comment)
+                                        <p class="text-sm text-gray-300 mt-1 break-words">
+                                            {{ $latestReview->comment }}
+                                        </p>
+                                    @endif
                                 </div>
-                            @endif
+
+                                <div class="mt-3">
+                                    <a href="{{ route('anime.show', $plan->anime->id) }}"
+                                    class="inline-block bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-white text-sm">
+                                        Mais reviews
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
                         </div>
                     </div>
                 </div>

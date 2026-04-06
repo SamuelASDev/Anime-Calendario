@@ -17,11 +17,12 @@ class Anime extends Model
     }
 
     protected $fillable = [
-    'mal_id',
-    'title',
-    'episodes',
-    'synopsis',
-    'anime_status',
-    'image'
+        'mal_id',
+        'title',
+        'episodes',
+        'synopsis',
+        'synopsis_pt',
+        'anime_status',
+        'image'
     ];
 }
