@@ -27,10 +27,6 @@
                             Episódios: {{ $anime->episodes }}
                         </p>
                     @endif
-
-                    <p class="text-sm text-gray-300 line-clamp-4">
-                        {{ $anime->synopsis }}
-                    </p>
                 </div>
 
             </div>
