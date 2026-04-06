@@ -80,6 +80,14 @@ Route::middleware(['auth'])->group(function () {
         ->whereNumber('anime')
         ->name('anime.show');
 
+    Route::get('/anime/{anime}/edit-synopsis', [AnimeController::class, 'editSynopsis'])
+        ->whereNumber('anime')
+        ->name('anime.synopsis.edit');
+
+    Route::patch('/anime/{anime}/synopsis', [AnimeController::class, 'updateSynopsis'])
+        ->whereNumber('anime')
+        ->name('anime.synopsis.update');
+
     /*
     |--------------------------------------------------------------------------
     | Watch plans globais

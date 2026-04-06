@@ -63,4 +63,25 @@ class AnimeController extends Controller
 
         return view('anime.show', compact('anime'));
     }
+
+    public function editSynopsis(Anime $anime)
+    {
+        return view('anime.edit-synopsis', compact('anime'));
+    }
+
+    public function updateSynopsis(Request $request, Anime $anime)
+    {
+        $request->validate([
+            'synopsis' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $anime->update([
+            'synopsis' => $request->synopsis,
+        ]);
+
+        return redirect()
+            ->route('anime.show', $anime->id)
+            ->with('success', 'Sinopse atualizada com sucesso.');
+    }
+
 }

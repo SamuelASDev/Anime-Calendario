@@ -117,6 +117,13 @@
                                         @endif
 
                                     </div>
+
+                                    <div class="mt-3">
+                                        <a href="{{ route('anime.show', $plan->anime->id) }}"
+                                        class="inline-block bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-white text-sm">
+                                            Mais reviews
+                                        </a>
+                                    </div>
                                 </div>
                             @endif
                         </div>

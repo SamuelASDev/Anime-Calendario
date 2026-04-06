@@ -1,12 +1,25 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto p-4 sm:p-6 text-white">
 
-        <div class="mb-6">
+        <div class="mb-6 flex items-center justify-between gap-3">
             <a href="{{ url()->previous() }}"
-               class="text-sm text-gray-400 hover:text-white">
+               class="text-sm text-gray-400 hover:text-white transition">
                 ← Voltar
             </a>
+
+            @auth
+                <a href="{{ route('anime.synopsis.edit', $anime->id) }}"
+                   class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition">
+                    Editar sinopse
+                </a>
+            @endauth
         </div>
+
+        @if(session('success'))
+            <div class="mb-4 rounded-lg border border-green-700 bg-green-900/40 px-4 py-3 text-sm text-green-300">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <div class="bg-gray-800 rounded-lg p-4 sm:p-6 shadow-md border border-gray-700">
 
@@ -18,22 +31,40 @@
                 </div>
 
                 <div class="flex-1">
-                    <h1 class="text-2xl sm:text-3xl font-bold mb-3">
-                        {{ $anime->title }}
-                    </h1>
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <h1 class="text-2xl sm:text-3xl font-bold">
+                            {{ $anime->title }}
+                        </h1>
 
-                    <div class="space-y-2 text-sm text-gray-300">
-                        <p><span class="text-white font-semibold">Episódios:</span> {{ $anime->episodes ?? 'Não definido' }}</p>
-                        <p><span class="text-white font-semibold">Status:</span> {{ $anime->anime_status ?? 'Não definido' }}</p>
+                        @auth
+                            <a href="{{ route('anime.synopsis.edit', $anime->id) }}"
+                               class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition">
+                                Editar sinopse
+                            </a>
+                        @endauth
+                    </div>
+
+                    <div class="mt-3 space-y-2 text-sm text-gray-300">
+                        <p>
+                            <span class="text-white font-semibold">Episódios:</span>
+                            {{ $anime->episodes ?? 'Não definido' }}
+                        </p>
+
+                        <p>
+                            <span class="text-white font-semibold">Status:</span>
+                            {{ $anime->anime_status ?? 'Não definido' }}
+                        </p>
                     </div>
 
                     <div class="mt-6">
-                        <h2 class="text-lg font-semibold mb-2 text-indigo-300">
-                            Sinopse
-                        </h2>
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                            <h2 class="text-lg font-semibold text-indigo-300">
+                                Sinopse
+                            </h2>
+                        </div>
 
-                        <div class="bg-gray-900 border border-gray-700 rounded p-4 text-sm text-gray-300 leading-relaxed">
-                            {{ $anime->synopsis_pt ?? $anime->synopsis ?? 'Sem sinopse disponível.' }}
+                        <div class="bg-gray-900 border border-gray-700 rounded p-4 text-sm text-gray-300 leading-relaxed whitespace-pre-line">
+                            {{ $anime->synopsis ?? 'Sem sinopse disponível.' }}
                         </div>
                     </div>
                 </div>
@@ -73,7 +104,7 @@
                                 @endif
 
                                 @if($meta->comment)
-                                    <p class="text-sm text-gray-300 break-words">
+                                    <p class="text-sm text-gray-300 break-words whitespace-pre-line">
                                         {{ $meta->comment }}
                                     </p>
                                 @endif
