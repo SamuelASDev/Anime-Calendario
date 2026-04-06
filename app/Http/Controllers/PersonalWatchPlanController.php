@@ -7,6 +7,7 @@ use App\Models\WatchPlan;
 use App\Models\WatchPlanDay;
 use App\Models\WatchLog;
 use Illuminate\Http\Request;
+use App\Models\UserAnimeMeta;
 
 class PersonalWatchPlanController extends Controller
 {
@@ -641,5 +642,50 @@ class PersonalWatchPlanController extends Controller
             ->decrement('top_position');
 
         return back()->with('success', 'Removido do Top 10');
+    }
+
+    public function createReview(Anime $anime)
+    {
+        $hasCompletedPersonalPlan = WatchPlan::where('anime_id', $anime->id)
+            ->where('user_id', auth()->id())
+            ->where('watch_status', 'concluido')
+            ->exists();
+
+        abort_unless($hasCompletedPersonalPlan, 403);
+
+        $anime->load('userMeta.user');
+
+        $myMeta = $anime->userMeta->firstWhere('user_id', auth()->id());
+
+        return view('personal.review', compact('anime', 'myMeta'));
+    }
+
+    public function storeReview(Request $request, Anime $anime)
+    {
+        $hasCompletedPersonalPlan = WatchPlan::where('anime_id', $anime->id)
+            ->where('user_id', auth()->id())
+            ->where('watch_status', 'concluido')
+            ->exists();
+
+        abort_unless($hasCompletedPersonalPlan, 403);
+
+        $request->validate([
+            'rating' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'comment' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        UserAnimeMeta::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'anime_id' => $anime->id,
+            ],
+            [
+                'rating' => $request->rating,
+                'comment' => $request->comment,
+            ]
+        );
+
+        return redirect()->route('personal.completed')
+            ->with('success', 'Review salva com sucesso!');
     }
 }

@@ -66,7 +66,7 @@
                             </div>
 
                             <div class="mt-4">
-                                <a href="{{ route('completed.review.create', $plan->anime->id) }}"
+                                <a href="{{ route('personal.completed.review.create', $plan->anime->id) }}"
                                 class="inline-block bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white text-sm">
                                     Fazer review
                                 </a>

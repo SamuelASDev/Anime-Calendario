@@ -33,6 +33,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('personal.animes.addTop');
     Route::patch('/me/animes/{anime}/top/remove', [PersonalWatchPlanController::class, 'removeFromTop'])
         ->name('personal.animes.removeTop');
+    Route::get('/me/completed/{anime}/review', [PersonalWatchPlanController::class, 'createReview'])
+        ->name('personal.completed.review.create');
+    Route::post('/me/completed/{anime}/review', [PersonalWatchPlanController::class, 'storeReview'])
+        ->name('personal.completed.review.store');
 
     Route::get('/users', function () {
     $users = \App\Models\User::where('is_public', true)->get();
