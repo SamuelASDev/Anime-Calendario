@@ -9,8 +9,18 @@
                    class="bg-zinc-900 border border-white/10 rounded-xl p-4 hover:bg-zinc-800 transition">
 
                     <div class="flex items-center gap-3">
-                        <div class="h-10 w-10 rounded-full bg-violet-500 flex items-center justify-center font-bold">
-                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                        <div class="h-10 w-10 rounded-full overflow-hidden border border-white/10 bg-zinc-800 shrink-0">
+                            @if($user->profile_photo_url)
+                                <img 
+                                    src="{{ $user->profile_photo_url }}"
+                                    alt="{{ $user->name }}"
+                                    class="h-full w-full object-cover"
+                                >
+                            @else
+                                <div class="h-full w-full flex items-center justify-center bg-violet-500 font-bold">
+                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                </div>
+                            @endif
                         </div>
 
                         <div class="min-w-0">
