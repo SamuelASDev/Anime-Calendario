@@ -238,9 +238,37 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('admin.animes.destroy');
 });
 
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 
+Route::get('/arruma-tudo-hosting', function () {
+    try {
+        // 1. Criar o link simbólico (agora com as funções liberadas)
+        // Se o link já existir, o Laravel vai ignorar ou avisar
+        Artisan::call('storage:link');
+        $output = "Link Simbólico: " . Artisan::output();
 
+        // 2. Limpar todos os caches que podem causar Erro 500
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('route:clear');
+
+        return "
+            <h1>Sucesso!</h1>
+            <p>Comando: php artisan storage:link executado.</p>
+            <p>Caches de Configuração, Rotas e Views limpos.</p>
+            <hr>
+            <pre>" . $output . "</pre>
+            <a href='/profile/public'>Voltar para o Perfil</a>
+        ";
+    } catch (\Exception $e) {
+        return "
+            <h1>Erro ao executar:</h1>
+            <p style='color:red'>" . $e->getMessage() . "</p>
+            <p>Certifique-se de que a pasta 'public/storage' não existe antes de rodar.</p>
+        ";
+    }
+});
 
 
 require __DIR__ . '/auth.php';
