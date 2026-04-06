@@ -91,32 +91,31 @@
                                 </div>
                             </div>
 
-                            @if($plan->anime->userMeta->count())
+                            @php
+                                $myMeta = $plan->anime->userMeta->firstWhere('user_id', auth()->id());
+                            @endphp
+
+                            @if($myMeta && ($myMeta->rating || $myMeta->comment))
                                 <div class="mt-4 border-t border-gray-700 pt-4">
-                                    <h3 class="text-sm font-semibold mb-2 text-blue-300">Reviews dos usuários</h3>
 
-                                    <div class="space-y-3">
-                                        @foreach($plan->anime->userMeta as $meta)
-                                            @if($meta->rating || $meta->comment)
-                                                <div class="bg-gray-900 border border-gray-700 rounded p-3">
-                                                    <p class="text-sm font-semibold text-white">
-                                                        {{ $meta->user->name }}
-                                                    </p>
+                                    <h3 class="text-sm font-semibold mb-2 text-indigo-300">
+                                        👤 Sua review
+                                    </h3>
 
-                                                    @if($meta->rating)
-                                                        <p class="text-sm text-yellow-300">
-                                                            Nota: {{ $meta->rating }}/10
-                                                        </p>
-                                                    @endif
+                                    <div class="bg-gray-900 border border-gray-700 rounded p-3">
 
-                                                    @if($meta->comment)
-                                                        <p class="text-sm text-gray-300 mt-1 break-words">
-                                                            {{ $meta->comment }}
-                                                        </p>
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        @endforeach
+                                        @if($myMeta->rating)
+                                            <p class="text-sm text-yellow-300">
+                                                Nota: {{ $myMeta->rating }}/10
+                                            </p>
+                                        @endif
+
+                                        @if($myMeta->comment)
+                                            <p class="text-sm text-gray-300 mt-1 break-words">
+                                                {{ $myMeta->comment }}
+                                            </p>
+                                        @endif
+
                                     </div>
                                 </div>
                             @endif
