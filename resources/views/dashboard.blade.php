@@ -68,7 +68,7 @@
 
                                         <p>
                                             <span class="text-gray-400">Assistidos:</span>
-                                            {{ $plan->episodes_watched }}
+                                            {{ $plan->current_episode_calculated }}
                                         </p>
                                     </div>
 
