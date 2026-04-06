@@ -78,10 +78,26 @@
                     <div class="space-y-4">
                         @foreach($reviews as $meta)
                             <div class="bg-gray-900 border border-gray-700 rounded p-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                                    <p class="font-semibold text-white">
-                                        {{ $meta->user->name }}
-                                    </p>
+                                <div class="flex items-center justify-between gap-3 mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-10 w-10 rounded-full overflow-hidden border border-white/10 bg-zinc-800 shrink-0">
+                                            @if($meta->user->profile_photo_url)
+                                                <img 
+                                                    src="{{ $meta->user->profile_photo_url }}"
+                                                    alt="{{ $meta->user->name }}"
+                                                    class="h-full w-full object-cover"
+                                                >
+                                            @else
+                                                <div class="h-full w-full flex items-center justify-center bg-violet-500 font-bold text-sm">
+                                                    {{ strtoupper(substr($meta->user->name, 0, 1)) }}
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <p class="font-semibold text-white">
+                                            {{ $meta->user->name }}
+                                        </p>
+                                    </div>
 
                                     @if($meta->updated_at)
                                         <p class="text-xs text-gray-400">
