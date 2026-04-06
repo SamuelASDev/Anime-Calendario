@@ -202,31 +202,37 @@
                                     @endif
                                 </div>
 
-                                @if(auth()->check() && auth()->id() === $user->id)
+                                {{-- Lógica de Botões --}}
+                                @if(auth()->check())
                                     <div class="flex gap-2 mt-3 flex-wrap">
-                                        {{-- FAVORITO --}}
-                                        <form method="POST" action="{{ route('personal.animes.favorite', $plan->anime->id) }}">
-                                            @csrf
-                                            @method('PATCH')
+                                        @if(auth()->id() === $user->id)
+                                            {{-- VISÃO DO DONO --}}
+                                            <form method="POST" action="{{ route('personal.animes.favorite', $plan->anime->id) }}">
+                                                @csrf @method('PATCH')
+                                                <button class="px-2 py-1 text-xs rounded {{ $myMeta && $myMeta->is_favorite ? 'bg-yellow-500 text-black' : 'bg-gray-700 hover:bg-gray-600' }}">
+                                                    {{ $myMeta && $myMeta->is_favorite ? '★ Favorito' : '☆ Favoritar' }}
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ route('personal.animes.addTop', $plan->anime->id) }}">
+                                                @csrf @method('PATCH')
+                                                <button class="px-2 py-1 text-xs rounded bg-violet-600 hover:bg-violet-700">➕ Top</button>
+                                            </form>
+                                        @else
+                                            {{-- VISÃO DO VISITANTE (Estilo Favoritar/Top) --}}
+                                            <form method="POST" action="{{ route('personal.watch-plans.follow', $plan->id) }}">
+                                                @csrf
+                                                <button type="submit" class="px-2 py-1 text-xs rounded bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/40 transition">
+                                                    📺 Acompanhar
+                                                </button>
+                                            </form>
 
-                                            <button
-                                                class="px-2 py-1 text-xs rounded
-                                                {{ $myMeta && $myMeta->is_favorite ? 'bg-yellow-500 text-black' : 'bg-gray-700 hover:bg-gray-600' }}">
-                                                
-                                                {{ $myMeta && $myMeta->is_favorite ? '★ Favorito' : '☆ Favoritar' }}
-                                            </button>
-                                        </form>
-
-                                        {{-- ADD TOP 10 --}}
-                                        <form method="POST" action="{{ route('personal.animes.addTop', $plan->anime->id) }}">
-                                            @csrf
-                                            @method('PATCH')
-
-                                            <button
-                                                class="px-2 py-1 text-xs rounded bg-violet-600 hover:bg-violet-700">
-                                                ➕ Top
-                                            </button>
-                                        </form>
+                                            <form method="POST" action="{{ route('completed.mark-watched', $plan->anime->id) }}">
+                                                @csrf
+                                                <button type="submit" class="px-2 py-1 text-xs rounded bg-green-600/20 text-green-400 border border-green-500/30 hover:bg-green-600/40 transition">
+                                                    ✅ Já assisti
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 @endif
                             </div>
@@ -267,35 +273,38 @@
                                     <h3 class="font-bold text-base break-words">
                                         {{ $plan->anime->title }}
                                     </h3>
-
                                     <p class="text-sm text-green-300 mt-1">Concluído</p>
                                 </div>
 
-                                @if(auth()->check() && auth()->id() === $user->id)
+                                {{-- Lógica de Botões --}}
+                                @if(auth()->check())
                                     <div class="flex gap-2 mt-3 flex-wrap">
-                                        {{-- FAVORITO --}}
-                                        <form method="POST" action="{{ route('personal.animes.favorite', $plan->anime->id) }}">
-                                            @csrf
-                                            @method('PATCH')
-
-                                            <button
-                                                class="px-2 py-1 text-xs rounded
-                                                {{ $myMeta && $myMeta->is_favorite ? 'bg-yellow-500 text-black' : 'bg-gray-700 hover:bg-gray-600' }}">
-                                                
-                                                {{ $myMeta && $myMeta->is_favorite ? '★ Favorito' : '☆ Favoritar' }}
-                                            </button>
-                                        </form>
-
-                                        {{-- ADD TOP 10 --}}
-                                        <form method="POST" action="{{ route('personal.animes.addTop', $plan->anime->id) }}">
-                                            @csrf
-                                            @method('PATCH')
-
-                                            <button
-                                                class="px-2 py-1 text-xs rounded bg-violet-600 hover:bg-violet-700">
-                                                ➕ Top
-                                            </button>
-                                        </form>
+                                        @if(auth()->id() === $user->id)
+                                            {{-- VISÃO DO DONO --}}
+                                            <form method="POST" action="{{ route('personal.animes.favorite', $plan->anime->id) }}">
+                                                @csrf @method('PATCH')
+                                                <button class="px-2 py-1 text-xs rounded {{ $myMeta && $myMeta->is_favorite ? 'bg-yellow-500 text-black' : 'bg-gray-700 hover:bg-gray-600' }}">
+                                                    {{ $myMeta && $myMeta->is_favorite ? '★ Favorito' : '☆ Favoritar' }}
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ route('personal.animes.addTop', $plan->anime->id) }}">
+                                                @csrf @method('PATCH')
+                                                <button class="px-2 py-1 text-xs rounded bg-violet-600 hover:bg-violet-700">➕ Top</button>
+                                            </form>
+                                        @else
+                                            {{-- VISÃO DO VISITANTE (Estilo Favoritar/Top) --}}
+                                            <form method="POST" action="{{ route('completed.mark-watched', $plan->anime->id) }}">
+                                                @csrf
+                                                <button type="submit" class="px-2 py-1 text-xs rounded bg-green-600/20 text-green-400 border border-green-500/30 hover:bg-green-600/40 transition">
+                                                    ✅ Já assisti
+                                                </button>
+                                            </form>
+                                            
+                                            <a href="{{ route('anime.show', $plan->anime->id) }}" 
+                                            class="px-2 py-1 text-xs rounded bg-zinc-800 text-zinc-300 border border-white/10 hover:bg-zinc-700 transition">
+                                                ℹ️ Detalhes
+                                            </a>
+                                        @endif
                                     </div>
                                 @endif
                             </div>

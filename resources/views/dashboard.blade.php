@@ -71,7 +71,6 @@
                                             {{ $plan->current_episode_calculated }}
                                         </p>
                                     </div>
-
                                     <div class="mt-3 grid grid-cols-2 gap-2">
                                         <a href="{{ route('anime.show', $plan->anime->id) }}"
                                         class="inline-flex items-center justify-center rounded bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 text-xs font-medium transition">
@@ -86,7 +85,7 @@
                                             </button>
                                         </form>
 
-                                        <form method="POST" action="{{ route('completed.mark-watched', $plan->anime->id) }}" class="col-span-2 sm:col-span-1 w-full">
+                                        <form method="POST" action="{{ route('completed.mark-watched', $plan->anime->id) }}" class="col-span-2 w-full">
                                             @csrf
                                             <button type="submit"
                                                 class="w-full inline-flex items-center justify-center rounded bg-green-600 hover:bg-green-700 text-white px-3 py-2 text-xs font-medium transition">

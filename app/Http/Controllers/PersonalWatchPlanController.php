@@ -697,7 +697,6 @@ class PersonalWatchPlanController extends Controller
     {
         $plan->load('anime', 'days', 'logs');
 
-        abort_if($plan->user_id !== null, 404);
 
         if (!$plan->anime) {
             return redirect()->back()->with('error', 'Anime não encontrado.');
