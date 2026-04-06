@@ -7,13 +7,29 @@
 
         <div class="bg-gray-800 rounded-lg p-4 shadow-md">
 
-            <div class="flex flex-col sm:flex-row gap-4">
+            {{-- BADGE PESSOAL --}}
+            <div class="mb-4">
+                <span class="inline-block bg-indigo-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                    👤 Review pessoal
+                </span>
+            </div>
+
+            {{-- VOLTAR --}}
+            <div class="mb-4">
+                <a href="{{ route('personal.completed') }}"
+                   class="text-sm text-gray-400 hover:text-white">
+                    ← Voltar
+                </a>
+            </div>
+
+            {{-- HEADER --}}
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
 
                 {{-- IMAGEM --}}
                 <div class="flex-shrink-0">
                     <img src="{{ $anime->image }}"
                          alt="{{ $anime->title }}"
-                         class="w-40 rounded-lg shadow">
+                         class="w-32 sm:w-40 rounded-lg shadow">
                 </div>
 
                 {{-- INFO --}}
@@ -28,6 +44,17 @@
                         </p>
                     @endif
 
+                    @if($anime->anime_status)
+                        <p class="text-sm text-gray-400 mb-2">
+                            Status: {{ $anime->anime_status }}
+                        </p>
+                    @endif
+
+                    @if($anime->synopsis)
+                        <p class="text-sm text-gray-300 line-clamp-4">
+                            {{ $anime->synopsis }}
+                        </p>
+                    @endif
                 </div>
 
             </div>
@@ -35,7 +62,7 @@
             {{-- FORM --}}
             <form action="{{ route('personal.completed.review.store', $anime->id) }}"
                   method="POST"
-                  class="mt-6 space-y-4">
+                  class="space-y-4">
 
                 @csrf
 
@@ -44,6 +71,7 @@
                     <label class="block mb-1 text-sm font-medium">
                         Nota (1 a 10)
                     </label>
+
                     <input type="number"
                            name="rating"
                            min="1"
@@ -57,12 +85,13 @@
                     <label class="block mb-1 text-sm font-medium">
                         Comentário
                     </label>
+
                     <textarea name="comment"
                               rows="4"
                               class="w-full rounded bg-gray-900 border border-gray-700 text-white p-2">{{ old('comment', $myMeta->comment ?? '') }}</textarea>
                 </div>
 
-                {{-- BOTÕES --}}
+                {{-- AÇÕES --}}
                 <div class="flex justify-between items-center mt-4">
 
                     <a href="{{ route('personal.completed') }}"
