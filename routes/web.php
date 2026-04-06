@@ -105,6 +105,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/watch-plans/create/{anime}', [WatchPlanController::class, 'create'])
         ->name('watch-plans.create');
 
+    Route::post('/me/watch-plans/follow/{plan}', [PersonalWatchPlanController::class, 'followFromGlobal'])
+    ->name('personal.watch-plans.follow');
+
     Route::post('/watch-plans/store/{anime}', [WatchPlanController::class, 'store'])
         ->name('watch-plans.store');
 
