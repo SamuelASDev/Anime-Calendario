@@ -63,6 +63,11 @@
                             @click.outside="open = false"
                             x-transition
                             class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
+                            
+                            <a href="route('profile.show', Auth::user()->username)"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                 👤 Perfil
+                            </a>
 
                             <a href="{{ route('personal.calendar') }}"
                                 class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -106,10 +111,6 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.show', Auth::user()->username)">
-                            Perfil
-                        </x-dropdown-link>
-
                         <x-dropdown-link :href="route('profile.edit')">
                             Configurações
                         </x-dropdown-link>
@@ -174,9 +175,9 @@
                 ✅ Concluídos
             </x-responsive-nav-link>
 
-            <x-nav-link :href="route('users.index')">
+            <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('completed.animes')">
                 👥 Usuários
-            </x-nav-link>
+            </x-responsive-nav-link>
 
             @if(auth()->user()?->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.animes.index')" :active="request()->routeIs('admin.animes.*')">
@@ -194,6 +195,10 @@
                 </button>
 
                 <div x-show="openPersonal" x-transition class="space-y-1">
+                
+                    <x-responsive-nav-link :href="route('profile.show', Auth::user()->username)">
+                        👤 Perfil
+                    </x-responsive-nav-link>
 
                     <x-responsive-nav-link :href="route('personal.calendar')">
                         📅 Meu calendário
@@ -211,6 +216,7 @@
                         🎛 Gerenciar meus animes
                     </x-responsive-nav-link>
 
+
                 </div>
             </div>
         </div>
@@ -223,9 +229,6 @@
             </div>
 
             <div class="mt-3 space-y-1 px-2">
-                <x-responsive-nav-link :href="route('profile.show', Auth::user()->username)">
-                    Perfil
-                </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('profile.edit')">
                     Configurações
