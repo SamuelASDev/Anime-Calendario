@@ -79,6 +79,9 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
+    Route::get('/animes', [AnimeController::class, 'allAnimeIndex'])
+        ->name('anime.index.all');
+
     Route::get('/anime/search', [AnimeController::class, 'search'])
         ->name('anime.search');
 
@@ -96,6 +99,8 @@ Route::middleware(['auth'])->group(function () {
     
     Route::post('/concluidos/{anime}/ja-assisti', [WatchPlanController::class, 'markAsWatched'])
         ->name('completed.mark-watched');
+
+
     /*
     |--------------------------------------------------------------------------
     | Watch plans globais

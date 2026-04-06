@@ -84,4 +84,34 @@ class AnimeController extends Controller
             ->with('success', 'Sinopse atualizada com sucesso.');
     }
 
+    public function allAnimeIndex()
+    {
+        $user = auth()->user();
+
+        $animes = \App\Models\Anime::with([
+            'userMeta.user',
+        ])->latest()->paginate(24);
+
+        $myWatchingAnimeIds = [];
+        $myCompletedAnimeIds = [];
+
+        if ($user) {
+            $myWatchingAnimeIds = \App\Models\WatchPlan::where('user_id', $user->id)
+                ->where('watch_status', 'assistindo')
+                ->pluck('anime_id')
+                ->toArray();
+
+            $myCompletedAnimeIds = \App\Models\WatchPlan::where('user_id', $user->id)
+                ->where('watch_status', 'concluido')
+                ->pluck('anime_id')
+                ->toArray();
+        }
+
+        return view('anime.index-all', compact(
+            'animes',
+            'myWatchingAnimeIds',
+            'myCompletedAnimeIds'
+        ));
+    }
+
 }

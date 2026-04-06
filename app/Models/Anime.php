@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\WatchPlan;
 
 class Anime extends Model
 {
@@ -25,4 +26,12 @@ class Anime extends Model
         'anime_status',
         'image'
     ];
+
+
+
+    public function watchPlans()
+    {
+        return $this->hasMany(WatchPlan::class);
+    }
+
 }

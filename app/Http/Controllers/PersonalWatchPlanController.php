@@ -92,7 +92,7 @@ class PersonalWatchPlanController extends Controller
         return $currentEpisode;
     }
 
-        public function edit(WatchPlan $plan)
+    public function edit(WatchPlan $plan)
     {
         $plan = WatchPlan::with('anime', 'days')
             ->where('id', $plan->id)

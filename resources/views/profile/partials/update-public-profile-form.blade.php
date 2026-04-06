@@ -34,7 +34,7 @@
 
             <div class="mt-2 flex items-center gap-4">
                 <img 
-                    src="{{ asset('public/storage/' . $user->profile_photo) }}"
+                    src="{{ $user->profile_photo_url }}"
                     class="w-20 h-20 rounded-full object-cover border"
                 >
                 <input type="file" name="profile_photo" class="text-sm text-white">

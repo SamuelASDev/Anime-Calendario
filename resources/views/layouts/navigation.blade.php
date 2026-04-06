@@ -18,6 +18,10 @@
                         🎬 Buscar
                     </x-nav-link>
 
+                    <x-nav-link :href="route('anime.index.all')" :active="request()->routeIs('anime.index.all')">
+                        📚 Todos os animes
+                    </x-nav-link>
+
                     <div x-data="{ open: false }" class="relative">
                         <button @click="open = !open"
                             class="inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition">
@@ -123,7 +127,7 @@
         <div class="pt-2 pb-3 space-y-1 px-2">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('anime.search')" :active="request()->routeIs('anime.search')">🎬 Buscar</x-responsive-nav-link>
-
+            <x-responsive-nav-link :href="route('anime.index.all')" :active="request()->routeIs('anime.index.all')">📚 Todos os animes</x-responsive-nav-link>
             <div x-data="{ openLive: false }">
                 <button @click="openLive = !openLive" class="w-full text-left px-3 py-2 text-white flex justify-between items-center">
                     📺 Live
