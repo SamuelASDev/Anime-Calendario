@@ -27,6 +27,7 @@
                             Episódios: {{ $anime->episodes }}
                         </p>
                     @endif
+
                 </div>
 
             </div>
