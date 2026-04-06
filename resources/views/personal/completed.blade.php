@@ -70,6 +70,25 @@
                                 class="inline-block bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white text-sm">
                                     Fazer review
                                 </a>
+                                @php
+                                    $myMeta = $plan->anime->userMeta->firstWhere('user_id', auth()->id());
+                                @endphp
+
+                                <div class="mt-4 flex flex-wrap gap-2 items-center">
+
+                                    {{-- FAVORITO --}}
+                                    <form method="POST" action="{{ route('personal.animes.favorite', $plan->anime->id) }}">
+                                        @csrf
+                                        @method('PATCH')
+
+                                        <button type="submit"
+                                            class="px-3 py-1 rounded text-sm
+                                            {{ $myMeta && $myMeta->is_favorite ? 'bg-yellow-500 text-black' : 'bg-gray-700 text-white hover:bg-gray-600' }}">
+                                            
+                                            {{ $myMeta && $myMeta->is_favorite ? '★ Favorito' : '☆ Favoritar' }}
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
 
                             @if($plan->anime->userMeta->count())

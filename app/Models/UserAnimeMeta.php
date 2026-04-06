@@ -13,6 +13,8 @@ class UserAnimeMeta extends Model
         'anime_id',
         'rating',
         'comment',
+        'is_favorite',
+        'top_position',
     ];
 
     public function user()

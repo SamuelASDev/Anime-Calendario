@@ -38,6 +38,10 @@
                         </x-nav-link>
                     @endif
 
+                    <x-nav-link :href="route('users.index')">
+                        👥 Usuários
+                    </x-nav-link>
+
                     <!-- Meu Espaço Dropdown -->
                     <div x-data="{ open: false }" class="relative">
                         <button @click="open = !open"
@@ -102,8 +106,12 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <x-dropdown-link :href="route('profile.show', Auth::user()->username)">
                             Perfil
+                        </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('profile.edit')">
+                            Configurações
                         </x-dropdown-link>
 
                         <form method="POST" action="{{ route('logout') }}">
@@ -166,6 +174,10 @@
                 ✅ Concluídos
             </x-responsive-nav-link>
 
+            <x-nav-link :href="route('users.index')">
+                👥 Usuários
+            </x-nav-link>
+
             @if(auth()->user()?->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.animes.index')" :active="request()->routeIs('admin.animes.*')">
                     🛠 Admin
@@ -211,9 +223,13 @@
             </div>
 
             <div class="mt-3 space-y-1 px-2">
-                <x-responsive-nav-link :href="route('profile.edit')">
+                <x-responsive-nav-link :href="route('profile.show', Auth::user()->username)">
                     Perfil
                 </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('profile.edit')">
+                    Configurações
+                </x-responsive-nav-link>'
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

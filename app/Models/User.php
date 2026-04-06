@@ -22,6 +22,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'username',
+        'bio',
+        'is_public',
+        'show_watching_public',
+        'show_completed_public',
+        'show_favorites_public',
+        'show_top10_public',
+        'show_reviews_public',
     ];
 
     /**

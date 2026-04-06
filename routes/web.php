@@ -20,6 +20,24 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::patch('/profile/public', [ProfileController::class, 'updatePublicProfile'])
+        ->name('profile.public.update');
+    Route::get('/u/{username}', [ProfileController::class, 'show'])
+        ->name('profile.show');
+    Route::patch('/me/animes/{anime}/favorite', [PersonalWatchPlanController::class, 'toggleFavorite'])
+        ->name('personal.animes.favorite');
+    Route::patch('/me/animes/{anime}/top', [PersonalWatchPlanController::class, 'updateTopPosition'])
+        ->name('personal.animes.top');
+    Route::patch('/me/animes/{anime}/top/add', [PersonalWatchPlanController::class, 'addToTop'])
+        ->name('personal.animes.addTop');
+    Route::patch('/me/animes/{anime}/top/remove', [PersonalWatchPlanController::class, 'removeFromTop'])
+        ->name('personal.animes.removeTop');
+
+    Route::get('/users', function () {
+    $users = \App\Models\User::where('is_public', true)->get();
+    return view('users.index', compact('users'));
+        })->name('users.index');
+
     Route::get('/anime/search', [AnimeController::class, 'search'])->name('anime.search');
 
     Route::get('/watch-plans/create/{anime}', [WatchPlanController::class, 'create'])

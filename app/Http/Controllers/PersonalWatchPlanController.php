@@ -533,4 +533,113 @@ class PersonalWatchPlanController extends Controller
         return redirect()->route('personal.history')
             ->with('success', 'Histórico pessoal atualizado com sucesso!');
     }
+
+    public function toggleFavorite(Anime $anime)
+    {
+        $meta = \App\Models\UserAnimeMeta::firstOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'anime_id' => $anime->id,
+            ],
+            [
+                'rating' => null,
+                'comment' => null,
+            ]
+        );
+
+        $meta->is_favorite = !$meta->is_favorite;
+        $meta->save();
+
+        return back()->with('success', 'Favorito atualizado com sucesso.');
+    }
+
+    public function updateTopPosition(Request $request, Anime $anime)
+    {
+        $data = $request->validate([
+            'top_position' => ['nullable', 'integer', 'min:1', 'max:10'],
+        ]);
+
+        $meta = \App\Models\UserAnimeMeta::firstOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'anime_id' => $anime->id,
+            ],
+            [
+                'rating' => null,
+                'comment' => null,
+            ]
+        );
+
+        if (!empty($data['top_position'])) {
+            \App\Models\UserAnimeMeta::where('user_id', auth()->id())
+                ->where('top_position', $data['top_position'])
+                ->update(['top_position' => null]);
+        }
+
+        $meta->top_position = $data['top_position'] ?? null;
+        $meta->save();
+
+        return back()->with('success', 'Top 10 atualizado com sucesso.');
+    }
+
+    public function addToTop(\App\Models\Anime $anime)
+    {
+        $userId = auth()->id();
+
+        $meta = \App\Models\UserAnimeMeta::firstOrCreate([
+            'user_id' => $userId,
+            'anime_id' => $anime->id,
+        ]);
+
+        // já está no top → não faz nada
+        if ($meta->top_position) {
+            return back();
+        }
+
+        // pega todos do top
+        $top = \App\Models\UserAnimeMeta::where('user_id', $userId)
+            ->whereNotNull('top_position')
+            ->orderBy('top_position')
+            ->get();
+
+        // shift geral (+1)
+        foreach ($top as $item) {
+            $item->top_position++;
+            $item->save();
+        }
+
+        // coloca como #1
+        $meta->top_position = 1;
+        $meta->save();
+
+        // mantém só 10
+        \App\Models\UserAnimeMeta::where('user_id', $userId)
+            ->where('top_position', '>', 10)
+            ->update(['top_position' => null]);
+
+        return back()->with('success', 'Adicionado ao Top 10!');
+    }
+
+    public function removeFromTop(\App\Models\Anime $anime)
+    {
+        $meta = \App\Models\UserAnimeMeta::where([
+            'user_id' => auth()->id(),
+            'anime_id' => $anime->id,
+        ])->first();
+
+        if (!$meta || !$meta->top_position) {
+            return back();
+        }
+
+        $removedPosition = $meta->top_position;
+        $meta->top_position = null;
+        $meta->save();
+
+        // reorganiza
+        \App\Models\UserAnimeMeta::where('user_id', auth()->id())
+            ->where('top_position', '>', $removedPosition)
+            ->decrement('top_position');
+
+        return back()->with('success', 'Removido do Top 10');
+    }
 }
