@@ -19,7 +19,7 @@
 
             <div class="mt-2">
                 <img 
-                    src="{{ $user->profile_banner ? asset('storage/' . $user->profile_banner) : 'https://via.placeholder.com/800x200' }}"
+                    src="{{ $user->profile_banner_url }}"
                     class="w-full h-40 object-cover rounded-lg mb-2"
                 >
             </div>
@@ -34,7 +34,7 @@
 
             <div class="mt-2 flex items-center gap-4">
                 <img 
-                    src="{{ $user->profile_photo ? asset('storage/' . $user->profile_photo) : 'https://via.placeholder.com/150' }}"
+                    src="{{ asset('public/storage/' . $user->profile_photo) }}"
                     class="w-20 h-20 rounded-full object-cover border"
                 >
                 <input type="file" name="profile_photo" class="text-sm text-white">
