@@ -64,7 +64,7 @@
                             x-transition
                             class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
                             
-                            <a href="route('profile.show', Auth::user()->username)"
+                            <a href="{{ route('profile.show', Auth::user()->username) }}"
                                 class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
                                  👤 Perfil
                             </a>
