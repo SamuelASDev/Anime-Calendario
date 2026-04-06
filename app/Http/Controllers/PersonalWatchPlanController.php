@@ -700,6 +700,11 @@ class PersonalWatchPlanController extends Controller
         }
 
         $today = now()->startOfDay();
+        $originalStart = \Carbon\Carbon::parse($plan->start_date)->startOfDay();
+
+        $newStartDate = $originalStart->lt($today)
+            ? $today
+            : $originalStart;
 
         $daysMap = $plan->days->keyBy('day_of_week');
         $logsMap = $plan->logs->keyBy(function ($log) {
@@ -707,7 +712,7 @@ class PersonalWatchPlanController extends Controller
         });
 
         $currentEpisode = (int) $plan->episodes_watched;
-        $date = \Carbon\Carbon::parse($plan->start_date)->startOfDay();
+        $date = $originalStart->copy();
 
         while ($date->lt($today)) {
             $dateKey = $date->format('Y-m-d');
@@ -739,7 +744,7 @@ class PersonalWatchPlanController extends Controller
             ],
             [
                 'episodes_watched' => $currentEpisode,
-                'start_date' => $today->format('Y-m-d'),
+                'start_date' => $newStartDate->format('Y-m-d'),
                 'watch_status' => $currentEpisode >= (int) ($plan->anime->episodes ?? PHP_INT_MAX)
                     ? 'concluido'
                     : 'assistindo',
