@@ -257,6 +257,10 @@ class PersonalWatchPlanController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
+        \App\Models\UserAnimeMeta::where('user_id', auth()->id())
+            ->where('anime_id', $plan->anime_id)
+            ->delete();
+        
         $plan->delete();
 
         return redirect()->route('personal.animes.index')
