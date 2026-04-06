@@ -30,10 +30,16 @@ Route::middleware(['auth'])->group(function () {
     | Dashboard
     |--------------------------------------------------------------------------
     */
-
     Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->middleware(['verified'])->name('dashboard');
+        $liveWatchingAnimes = \App\Models\WatchPlan::with('anime')
+            ->whereNull('user_id')
+            ->where('watch_status', 'assistindo')
+            ->orderByDesc('updated_at')
+            ->take(6)
+            ->get();
+
+        return view('dashboard', compact('liveWatchingAnimes'));
+    })->middleware(['auth', 'verified'])->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
