@@ -23,8 +23,8 @@
                 </h3>
                 <p class="text-gray-600 dark:text-gray-300">
                     Acompanhe nossas lives diretamente no canal:
-                    <a href="https://www.twitch.tv/sapustristesdasilva" target="_blank" class="text-purple-400 hover:text-purple-300 font-medium underline">
-                        twitch.tv/sapustristesdasilva
+                    <a href="https://www.twitch.tv/astaroth_frog" target="_blank" class="text-purple-400 hover:text-purple-300 font-medium underline">
+                        www.twitch.tv/astaroth_frog
                     </a>
                 </p>
             </div>
