@@ -490,7 +490,7 @@ class WatchPlanController extends Controller
         );
 
         return redirect()
-            ->route('completed.review.create', $anime->id)
+            ->route('personal.completed.review.create', $anime->id)
             ->with('success', 'Anime adicionado aos seus concluídos. Agora você já pode fazer sua review!');
     }
         
