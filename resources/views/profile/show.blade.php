@@ -5,7 +5,7 @@
             {{-- Banner --}}
             <div class="relative h-48 sm:h-56 lg:h-72 w-full">
                 @if($user->profile_banner)
-                    <img src="{{ asset('storage/' . $user->profile_banner) }}" alt="Banner de {{ $user->name }}" class="h-full w-full object-cover">
+                    <img src="{{ $user->profile_banner_url }}" alt="Banner de {{ $user->name }}" class="h-full w-full object-cover">
                 @endif
 
                 <div class="absolute inset-0 bg-black/35"></div>
@@ -19,7 +19,7 @@
                             {{-- Foto de perfil --}}
                             <div class="shrink-0">
                                 @if($user->profile_photo)
-                                    <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Foto de {{ $user->name }}" class="h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32 rounded-3xl object-cover border-4 border-zinc-900 shadow-2xl bg-zinc-800">
+                                    <img src="{{ $user->profile_photo_url }}" alt="Foto de {{ $user->name }}" class="h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32 rounded-3xl object-cover border-4 border-zinc-900 shadow-2xl bg-zinc-800">
                                 @else
                                     <div class="h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32 rounded-3xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-3xl sm:text-4xl font-bold shadow-2xl border-4 border-zinc-900">
                                         {{ strtoupper(substr($user->name, 0, 1)) }}
