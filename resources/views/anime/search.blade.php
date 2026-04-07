@@ -51,7 +51,17 @@
                                 <input type="hidden" name="synopsis" value="{{ $anime['synopsis'] }}">
                                 <input type="hidden" name="status" value="{{ $anime['status'] }}">
                                 <input type="hidden" name="image" value="{{ $anime['images']['jpg']['image_url'] }}">
-                                <input type="hidden" name="genres" value="{{ collect($anime['genres'] ?? [])->pluck('name')->implode(', ') }}">
+                                @php
+                                    $genres = collect($anime['genres'] ?? [])->pluck('name');
+                                    $themes = collect($anime['themes'] ?? [])->pluck('name');
+                                    $demographics = collect($anime['demographics'] ?? [])->pluck('name');
+
+                                    $allTags = $genres
+                                        ->merge($themes)
+                                        ->merge($demographics)
+                                        ->implode(', ');
+                                @endphp
+                                <input type="hidden" name="genres" value="{{ $allTags }}">
                                 <input type="hidden" name="target" value="global">
 
                                 <button class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded w-full">
@@ -68,7 +78,17 @@
                             <input type="hidden" name="synopsis" value="{{ $anime['synopsis'] }}">
                             <input type="hidden" name="status" value="{{ $anime['status'] }}">
                             <input type="hidden" name="image" value="{{ $anime['images']['jpg']['image_url'] }}">
-                            <input type="hidden" name="genres" value="{{ collect($anime['genres'] ?? [])->pluck('name')->implode(', ') }}">
+                            @php
+                                $genres = collect($anime['genres'] ?? [])->pluck('name');
+                                $themes = collect($anime['themes'] ?? [])->pluck('name');
+                                $demographics = collect($anime['demographics'] ?? [])->pluck('name');
+
+                                $allTags = $genres
+                                    ->merge($themes)
+                                    ->merge($demographics)
+                                    ->implode(', ');
+                            @endphp
+                            <input type="hidden" name="genres" value="{{ $allTags }}">
                             <input type="hidden" name="target" value="personal">
 
                             <button class="bg-purple-600 hover:bg-purple-700 text-white text-sm px-3 py-2 rounded w-full">
