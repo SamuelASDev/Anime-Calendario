@@ -88,9 +88,15 @@ class AnimeController extends Controller
     {
         $user = auth()->user();
 
-        $animes = \App\Models\Anime::with([
+        $query = \App\Models\Anime::with([
             'userMeta.user',
-        ])->latest()->paginate(24);
+        ]);
+
+        if (request('q')) {
+            $query->where('title', 'like', '%' . request('q') . '%');
+        }
+
+        $animes = $query->latest()->paginate(24)->withQueryString();
 
         $myWatchingAnimeIds = [];
         $myCompletedAnimeIds = [];
