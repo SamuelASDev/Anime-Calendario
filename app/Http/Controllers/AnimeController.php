@@ -30,6 +30,7 @@ class AnimeController extends Controller
             'synopsis' => ['nullable'],
             'status' => ['nullable'],
             'image' => ['nullable'],
+            'genres' => ['nullable', 'string'],
             'target' => ['required', 'in:global,personal'],
         ]);
 
@@ -41,6 +42,7 @@ class AnimeController extends Controller
                 'synopsis' => $request->synopsis,
                 'anime_status' => $request->status,
                 'image' => $request->image,
+                'genres' => $request->genres,
             ]
         );
 

@@ -24,7 +24,8 @@ class Anime extends Model
         'synopsis',
         'synopsis_pt',
         'anime_status',
-        'image'
+        'image',
+        'genres',
     ];
 
 
