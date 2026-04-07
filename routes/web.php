@@ -202,6 +202,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::patch('/me/animes/{anime}/top/remove', [PersonalWatchPlanController::class, 'removeFromTop'])
         ->name('personal.animes.removeTop');
+
+    Route::patch('/personal/animes/{anime}/top/up', [PersonalWatchPlanController::class, 'moveTopUp'])
+        ->name('personal.animes.top.up');
+
+    Route::patch('/personal/animes/{anime}/top/down', [PersonalWatchPlanController::class, 'moveTopDown'])
+        ->name('personal.animes.top.down');
 });
 
 /*

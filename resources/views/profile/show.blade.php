@@ -71,6 +71,7 @@
                 </div>
             </div>
         </div>
+        
         {{-- Top 10 --}}
         @if($user->show_top10_public && $top10->count())
             <section class="mb-8">
@@ -94,9 +95,42 @@
                                         alt="{{ $item->anime->title }}"
                                         class="h-full w-full object-cover"
                                     >
-                                    <div class="absolute top-2 left-2 h-8 min-w-8 px-2 rounded-full bg-black/70 text-yellow-300 text-sm font-bold flex items-center justify-center">
-                                        #{{ $item->top_position }}
-                                    </div>
+
+                                    @if(auth()->check() && auth()->id() === $user->id)
+                                        <div class="absolute top-2 left-2 right-2 flex items-center justify-between gap-2">
+                                            <form method="POST" action="{{ route('personal.animes.top.up', $item->anime->id) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button
+                                                    type="submit"
+                                                    class="h-8 w-8 rounded-full bg-black/70 text-white text-sm font-bold flex items-center justify-center border border-white/10 hover:bg-violet-600 transition"
+                                                    title="Subir posição"
+                                                >
+                                                    ↑
+                                                </button>
+                                            </form>
+
+                                            <div class="h-8 min-w-8 px-2 rounded-full bg-black/70 text-yellow-300 text-sm font-bold flex items-center justify-center border border-white/10">
+                                                #{{ $item->top_position }}
+                                            </div>
+
+                                            <form method="POST" action="{{ route('personal.animes.top.down', $item->anime->id) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button
+                                                    type="submit"
+                                                    class="h-8 w-8 rounded-full bg-black/70 text-white text-sm font-bold flex items-center justify-center border border-white/10 hover:bg-violet-600 transition"
+                                                    title="Descer posição"
+                                                >
+                                                    ↓
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <div class="absolute top-2 left-2 h-8 min-w-8 px-2 rounded-full bg-black/70 text-yellow-300 text-sm font-bold flex items-center justify-center border border-white/10">
+                                            #{{ $item->top_position }}
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div class="flex-1 p-4 min-w-0 flex flex-col justify-center">
@@ -117,18 +151,19 @@
                                     @endif
 
                                     @if(auth()->check() && auth()->id() === $user->id)
-                                        <form method="POST" action="{{ route('personal.animes.removeTop', $item->anime->id) }}">
-                                            @csrf
-                                            @method('PATCH')
+                                        <div class="mt-3 flex flex-wrap gap-2">
+                                            <form method="POST" action="{{ route('personal.animes.removeTop', $item->anime->id) }}">
+                                                @csrf
+                                                @method('PATCH')
 
-                                            <button
-                                                class="mt-3 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium
-                                                bg-red-500/10 text-red-400 border border-red-500/20
-                                                hover:bg-red-500/20 hover:text-red-300 transition">
-                                                
-                                                ❌ Remover do Top
-                                            </button>
-                                        </form>
+                                                <button
+                                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium
+                                                    bg-red-500/10 text-red-400 border border-red-500/20
+                                                    hover:bg-red-500/20 hover:text-red-300 transition">
+                                                    ❌ Remover do Top
+                                                </button>
+                                            </form>
+                                        </div>
                                     @endif
                                 </div>
                             </div>

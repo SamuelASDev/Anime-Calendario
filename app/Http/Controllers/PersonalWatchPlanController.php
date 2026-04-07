@@ -769,4 +769,64 @@ class PersonalWatchPlanController extends Controller
             ->with('success', 'Anime adicionado ao seu espaço no mesmo estágio atual!');
     }
 
+    public function moveTopUp(\App\Models\Anime $anime)
+    {
+        $userId = auth()->id();
+
+        $current = \App\Models\UserAnimeMeta::where('user_id', $userId)
+            ->where('anime_id', $anime->id)
+            ->whereNotNull('top_position')
+            ->firstOrFail();
+
+        if ($current->top_position <= 1) {
+            return back()->with('success', 'Esse anime já está no topo.');
+        }
+
+        $targetPosition = $current->top_position - 1;
+
+        $other = \App\Models\UserAnimeMeta::where('user_id', $userId)
+            ->where('top_position', $targetPosition)
+            ->first();
+
+        if ($other) {
+            $other->update(['top_position' => $current->top_position]);
+        }
+
+        $current->update(['top_position' => $targetPosition]);
+
+        return back()->with('success', 'Anime subiu no Top 10.');
+    }
+
+    public function moveTopDown(\App\Models\Anime $anime)
+    {
+        $userId = auth()->id();
+
+        $current = \App\Models\UserAnimeMeta::where('user_id', $userId)
+            ->where('anime_id', $anime->id)
+            ->whereNotNull('top_position')
+            ->firstOrFail();
+
+        $maxPosition = \App\Models\UserAnimeMeta::where('user_id', $userId)
+            ->whereNotNull('top_position')
+            ->max('top_position');
+
+        if ($current->top_position >= $maxPosition) {
+            return back()->with('success', 'Esse anime já está na última posição.');
+        }
+
+        $targetPosition = $current->top_position + 1;
+
+        $other = \App\Models\UserAnimeMeta::where('user_id', $userId)
+            ->where('top_position', $targetPosition)
+            ->first();
+
+        if ($other) {
+            $other->update(['top_position' => $current->top_position]);
+        }
+
+        $current->update(['top_position' => $targetPosition]);
+
+        return back()->with('success', 'Anime desceu no Top 10.');
+    }
+
 }
