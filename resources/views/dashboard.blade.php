@@ -76,7 +76,7 @@
                     <div class="rounded-xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-5">
                         <p class="text-base font-semibold text-gray-900 dark:text-white mb-2">1. Encontre um anime</p>
                         <p class="text-sm text-gray-600 dark:text-gray-300">
-                            Use a busca para encontrar um anime e adicionar ele ao sistema geral ou ao seu espaço pessoal.
+                            Use a busca para encontrar um anime e adicionar ele ao seu espaço pessoal.
                         </p>
                     </div>
 
