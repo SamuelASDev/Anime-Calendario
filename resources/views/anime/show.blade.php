@@ -38,6 +38,18 @@
                     </div>
 
                     <div class="mt-3 space-y-2 text-sm text-gray-300">
+
+                        
+                        @if($anime->genres)
+                            <div class="flex flex-wrap gap-2">
+                                @foreach(explode(',', $anime->genres) as $genre)
+                                    <span class="px-2 py-1 text-xs rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                        {{ trim($genre) }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
+
                         <p>
                             <span class="text-white font-semibold">Episódios:</span>
                             {{ $anime->episodes ?? 'Não definido' }}
