@@ -125,9 +125,18 @@
 
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden bg-gray-900 border-t border-gray-700">
         <div class="pt-2 pb-3 space-y-1 px-2">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('anime.search')" :active="request()->routeIs('anime.search')">🎬 Buscar</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('anime.index.all')" :active="request()->routeIs('anime.index.all')">📚 Todos os animes</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                Dashboard
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('anime.search')" :active="request()->routeIs('anime.search')">
+                🎬 Buscar
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('anime.index.all')" :active="request()->routeIs('anime.index.all')">
+                📚 Todos os animes
+            </x-responsive-nav-link>
+
             <div x-data="{ openLive: false }">
                 <button @click="openLive = !openLive" class="w-full text-left px-3 py-2 text-white flex justify-between items-center">
                     📺 Live
@@ -154,7 +163,36 @@
                 </div>
             </div>
 
-            <x-responsive-nav-link :href="route('users.index')">👥 Usuários</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('users.index')">
+                👥 Usuários
+            </x-responsive-nav-link>
+
+            @if(auth()->user()?->role === 'admin')
+                <x-responsive-nav-link :href="route('admin.animes.index')" :active="request()->routeIs('admin.animes.*')">
+                    🛠 Admin
+                </x-responsive-nav-link>
+            @endif
+        </div>
+
+        <div class="border-t border-gray-700 pt-4 pb-3 px-4">
+            <div class="mb-3">
+                <div class="text-base font-medium text-white">{{ Auth::user()->name }}</div>
+                <div class="text-sm text-gray-400">{{ Auth::user()->email }}</div>
+            </div>
+
+            <div class="space-y-1">
+                <x-responsive-nav-link :href="route('profile.edit')">
+                    Configurações
+                </x-responsive-nav-link>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <x-responsive-nav-link :href="route('logout')"
+                        onclick="event.preventDefault(); this.closest('form').submit();">
+                        Sair
+                    </x-responsive-nav-link>
+                </form>
+            </div>
         </div>
     </div>
 </nav>
