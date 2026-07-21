@@ -24,21 +24,23 @@ class PersonalWatchPlanController extends Controller
         $completedPlans = collect();
 
         foreach ($plans as $plan) {
-            $plan->current_episode_calculated = $this->calculateCurrentEpisode($plan);
-
             $totalEpisodes = $plan->anime->episodes;
 
-            $isFinishedByEpisodes = !empty($totalEpisodes)
-                && $plan->current_episode_calculated >= $totalEpisodes;
+            // 1. Calcula localmente em uma variável simples (sem colocar no $plan ainda)
+            $calculatedEpisode = $this->calculateCurrentEpisode($plan);
 
+            $isFinishedByEpisodes = !empty($totalEpisodes)
+                && $calculatedEpisode >= $totalEpisodes;
+
+            // 2. Se finalizou, faz o update no banco com a instância limpa
             if ($isFinishedByEpisodes && $plan->watch_status !== 'concluido') {
                 $plan->update([
                     'watch_status' => 'concluido',
                 ]);
-
-                $plan->watch_status = 'concluido';
-                $plan->current_episode_calculated = $totalEpisodes;
             }
+
+            // 3. AGORA SIM atribui as propriedades dinâmicas no modelo apenas para uso na View
+            $plan->current_episode_calculated = $isFinishedByEpisodes ? $totalEpisodes : $calculatedEpisode;
 
             if ($plan->watch_status === 'concluido') {
                 $completedPlans->push($plan);
