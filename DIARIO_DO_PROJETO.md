@@ -2,7 +2,7 @@
 
 Última atualização: 2026-10-15.
 
-Branch de trabalho atual: `dev`, acompanhando origin/dev. Implementação de fragmentos, ordenação eficiente, normalização e validação publicada em `2874ef9`, com CI remota verde; o stash antigo foi mantido como backup.
+Branch de trabalho atual: `main`, acompanhando origin/main. A `dev` foi integrada por fast-forward até `ea116d5`; implementação de fragmentos, ordenação eficiente, normalização e validação publicada em `2874ef9`, com CI remota verde. O registro desta integração é um commit de documentação adicional na main; o stash antigo foi mantido como backup.
 
 ## Ponto de retomada
 
@@ -26,6 +26,13 @@ Branch de trabalho atual: `dev`, acompanhando origin/dev. Implementação de fra
 - Pendências opcionais: ampliar a matriz de dispositivos e realizar auditoria de teclado, contraste e leitor de tela. Alterações visuais anteriores continuam locais, sem novo commit/push.
 
 ## Como usar este diário
+
+### 2026-10-15 — Integração de dev em main — concluído
+
+- Pedido: dar merge da dev na main e enviar main para o remoto.
+- Estado inicial: árvore limpa, dev/origin/dev em ea116d5, main/origin/main em 109d3f7. Fetch executado; main não tinha commits exclusivos.
+- Integração por fast-forward de dev em main, sem conflitos, preservando todos os commits. Main publicada em origin/main junto deste registro de documentação.
+- Validação: integração não alterou código além da versão já aprovada pela CI; não repetidos testes locais. Conferidos árvore limpa e alinhamento entre main e origin/main após push. Branch de trabalho ao encerrar: main. Dev permanece em ea116d5; a diferença adicional é este registro no diário.
 
 ### 2026-10-15 — Fragmentos, ordenação eficiente e validação — concluído, CI remota aprovada
 
