@@ -2,7 +2,7 @@
 
 Última atualização: 2026-10-15.
 
-Branch de trabalho atual: `dev`, acompanhando origin/dev. Baseline desta etapa: `2e4d6b1` (layout do site definido), já publicada e com CI verde. A etapa de fragmentos, ordenação eficiente, normalização e validação está sendo publicada para confirmar a nova CI; o stash antigo foi mantido como backup.
+Branch de trabalho atual: `dev`, acompanhando origin/dev. Implementação de fragmentos, ordenação eficiente, normalização e validação publicada em `2874ef9`, com CI remota verde; o stash antigo foi mantido como backup.
 
 ## Ponto de retomada
 
@@ -27,7 +27,7 @@ Branch de trabalho atual: `dev`, acompanhando origin/dev. Baseline desta etapa: 
 
 ## Como usar este diário
 
-### 2026-10-15 — Fragmentos, ordenação eficiente e validação — concluído localmente; CI remota em verificação
+### 2026-10-15 — Fragmentos, ordenação eficiente e validação — concluído, CI remota aprovada
 
 - Pedido: implementar os cinco pontos da avaliação estrutural: respostas específicas por bloco, ordenar sem regravar coleções, melhorar templates, normalizar API e ampliar validação de produção.
 - Perfil: mutações retornam JSON com mensagem/blocos; GET autenticado com Accept JSON e blocks[] devolve somente os parciais permitidos. ProfileQuery consulta apenas as coleções solicitadas; privacidade/filtros/paginação preservados. Parâmetros de fragmento não contaminam os links de paginação. JS modular em collections/profile.js; erro após salvar informa que o banco foi atualizado. Top 10 vazio mantém raiz oculta para poder reaparecer.
@@ -38,7 +38,7 @@ Branch de trabalho atual: `dev`, acompanhando origin/dev. Baseline desta etapa: 
 - Verificação local: 87 testes/394 assertions; 7 testes de navegador; build; Pint; Blade compilado; diff check. Smoke MySQL confirmou ordens BIGINT para duas listas em transação revertida. Nenhum domínio local foi apagado/resemeado.
 - Benchmark isolado: 20 movimentos/cenário com 100/1.000/10.000 itens, máximo 7 consultas/2 gravações em todos. Medianas a 10.000 itens: favoritos 2,089 ms, concluídos 6,842 ms; pico 32 MB. SQLite em memória, não representa carga MySQL de produção. Script reproduzível e PERFORMANCE.md adicionados.
 - Dependências: Playwright adicionado; atualizações compatíveis do lockfile aplicadas. Formatador Blade foi usado uma vez e removido das dependências; auditoria npm após correções compatíveis ainda aponta 7 avisos em dependências de desenvolvimento ligadas ao Tailwind 3 (sem upgrade forçado para Tailwind 4 nesta etapa).
-- CI: baseline 2e4d6b1 confirmada verde em https://github.com/SamuelASDev/Anime-Calendario/actions/runs/38835763101. Workflow ampliado para benchmark/Playwright/artefatos; execução do novo commit será registrada ao concluir. Próximos trabalhos opcionais: carga concorrente em MySQL descartável e auditoria de acessibilidade completa.
+- CI: implementação 2874ef9 confirmada verde em https://github.com/SamuelASDev/Anime-Calendario/actions/runs/38837090426, com backend, build, benchmark e sete testes Playwright executados no Ubuntu. Benchmark publicado como artefato. Baseline anterior 2e4d6b1 também estava verde. A busca real Tenrai foi revalidada após a mudança para DTO: dez resultados, primeiro Naruto/MAL 20, tipo CatalogAnime. Documentação final registrada em commit separado, sem mudança de código. Próximos trabalhos opcionais: carga concorrente em MySQL descartável e auditoria de acessibilidade completa.
 
 ### 2026-10-15 — Estrela amarela nos favoritos — concluído
 
