@@ -1,35 +1,37 @@
-@props(['plan', 'routePrefix'])
-<article class="rounded-xl border border-gray-700 bg-gray-800 p-4 flex gap-4">
-    <img loading="lazy" src="{{ $plan->anime->image }}" alt="{{ $plan->anime->title }}" class="w-20 h-28 rounded-lg object-cover shrink-0">
-    <div class="min-w-0 flex-1">
-        <a href="{{ route('anime.show', $plan->anime) }}" class="font-semibold hover:text-indigo-300">{{ $plan->anime->title }}</a>
+@props(['plan', 'routePrefix', 'editable' => true])
+@php($episode = $plan->current_episode_calculated)
+<article class="anime-card plan-card" data-anime-card>
+    <div class="plan-cover">@if($plan->anime->image)<img loading="lazy" src="{{ $plan->anime->image }}" alt="Capa de {{ $plan->anime->title }}">@endif</div>
+    <div class="plan-content">
+        <div><x-status-badge :status="$plan->watch_status" /></div>
+        <h3 class="card-title"><a class="card-link" href="{{ route('anime.show', $plan->anime) }}">{{ $plan->anime->title }}</a></h3>
         @if($plan->watch_status === 'pretendo_assistir')
-            <p class="text-sm text-amber-200 mt-2">Pretendo assistir · Ainda não iniciado</p>
+            <p class="card-note">Uma história esperando a sua vez.</p>
         @else
-            <p class="text-sm text-gray-300 mt-2">Progresso: {{ $plan->current_episode_calculated }} / {{ $plan->anime->episodes ?? '?' }}</p>
+            <div><p class="card-note">{{ $episode }} <span class="text-slate-600">/</span> {{ $plan->anime->episodes ?? '?' }} episódios</p>
+                @if($plan->anime->episodes)<div class="progress-track" role="progressbar" aria-label="Progresso de {{ $plan->anime->title }}" aria-valuenow="{{ $episode }}" aria-valuemin="0" aria-valuemax="{{ $plan->anime->episodes }}"><div class="progress-fill" style="width:{{ min(100, $episode / max(1, $plan->anime->episodes) * 100) }}%"></div></div>@endif
+            </div>
         @endif
-        <div class="flex flex-wrap gap-2 mt-4 text-sm">
-            <a class="rounded bg-gray-700 px-3 py-2" href="{{ route($routePrefix.'.edit', $plan) }}">Editar</a>
-            @if($plan->watch_status === 'pretendo_assistir')
-                <a class="rounded bg-indigo-600 px-3 py-2" href="{{ route($routePrefix === 'personal.animes' ? 'personal.watch-plans.create' : 'watch-plans.create', $plan->anime) }}">Começar a assistir</a>
+        <div class="card-actions">
+            @if($editable)
+                @if($plan->watch_status === 'pretendo_assistir')
+                    <a class="btn btn-primary btn-sm" href="{{ route($routePrefix === 'personal.animes' ? 'personal.watch-plans.create' : 'watch-plans.create', $plan->anime) }}"><x-icon name="play" />Começar a assistir</a>
+                @elseif($plan->watch_status === 'concluido' && $routePrefix === 'personal.animes')
+                    <a class="btn btn-primary btn-sm" href="{{ route('personal.completed.review.create', $plan->anime) }}"><x-icon name="star" />Avaliar</a>
+                @else
+                    <a class="btn btn-primary btn-sm" href="{{ route($routePrefix.'.log.create', $plan) }}"><x-icon name="plus" />Registrar</a>
+                @endif
+                <a class="btn btn-secondary btn-sm" href="{{ route($routePrefix.'.edit', $plan) }}">Editar</a>
+                @if(! in_array($plan->watch_status, ['concluido', 'pretendo_assistir']))
+                    @php($action = $plan->watch_status === 'pausado' ? 'resume' : 'pause')
+                    <form method="POST" action="{{ route($routePrefix.'.'.$action, $plan) }}">@csrf @method('PATCH')<button class="btn btn-quiet btn-sm" aria-label="{{ $action === 'pause' ? 'Pausar' : 'Retomar' }} {{ $plan->anime->title }}" title="{{ $action === 'pause' ? 'Pausar' : 'Retomar' }}"><x-icon :name="$action === 'pause' ? 'pause' : 'play'" /></button></form>
+                    <form method="POST" action="{{ route($routePrefix.'.complete', $plan) }}">@csrf @method('PATCH')<button class="btn btn-quiet btn-sm" aria-label="Concluir {{ $plan->anime->title }}" title="Concluir"><x-icon name="check" /></button></form>
+                @endif
+                <form method="POST" action="{{ route($routePrefix.'.destroy', $plan) }}" onsubmit="return confirm('Remover este planejamento?')">@csrf @method('DELETE')<button class="btn btn-danger btn-sm" aria-label="Remover {{ $plan->anime->title }}" title="Remover"><x-icon name="trash" /></button></form>
             @else
-                <a class="rounded bg-indigo-600 px-3 py-2" href="{{ route($routePrefix.'.log.create', $plan) }}">Registrar</a>
+                <form method="POST" action="{{ route('personal.watch-plans.follow', $plan) }}">@csrf<button class="btn btn-secondary btn-sm"><x-icon name="plus" />Acompanhar</button></form>
+                <x-watch-later-button :anime="$plan->anime" />
             @endif
-            @if(! in_array($plan->watch_status, ['concluido', 'pretendo_assistir']))
-                @php($action = $plan->watch_status === 'pausado' ? 'resume' : 'pause')
-                <form method="POST" action="{{ route($routePrefix.'.'.$action, $plan) }}">
-                    @csrf @method('PATCH')
-                    <button class="rounded bg-gray-700 px-3 py-2">{{ $action === 'pause' ? 'Pausar' : 'Retomar' }}</button>
-                </form>
-                <form method="POST" action="{{ route($routePrefix.'.complete', $plan) }}">
-                    @csrf @method('PATCH')
-                    <button class="rounded bg-green-700 px-3 py-2">Concluir</button>
-                </form>
-            @endif
-            <form method="POST" action="{{ route($routePrefix.'.destroy', $plan) }}" onsubmit="return confirm('Remover este planejamento?')">
-                @csrf @method('DELETE')
-                <button class="rounded bg-red-700 px-3 py-2">Remover</button>
-            </form>
         </div>
     </div>
 </article>

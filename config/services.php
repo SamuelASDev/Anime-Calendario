@@ -2,6 +2,10 @@
 
 return [
 
+    'anime_catalog' => [
+        'base_url' => env('ANIME_CATALOG_BASE_URL', 'https://api.tenrai.org/v1'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

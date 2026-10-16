@@ -89,6 +89,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/me/animes/{anime}/favorite', [LibraryController::class, 'toggleFavorite'])
         ->name('personal.animes.favorite');
 
+    Route::patch('/me/animes/{anime}/collection-order', [LibraryController::class, 'moveCollection'])
+        ->name('personal.animes.collection-order');
+
     Route::patch('/me/animes/{anime}/top', [LibraryController::class, 'updateTopPosition'])
         ->name('personal.animes.top');
 

@@ -1,30 +1,13 @@
 <!DOCTYPE html>
-<html class="dark" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>Anime Tracker</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
-        <div>
-            <a href="/">
-                <img src="/images/logoSapo.png" class="w-20 h-20 object-contain" alt="Logo">
-            </a>
-        </div>
-
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
-            </div>
-        </div>
-    </body>
-</html>
+<html class="dark" lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><meta name="theme-color" content="#0c0f16"><title>Anime Tracker · Sua conta</title>@vite(['resources/css/app.css', 'resources/js/app.js'])</head>
+<body>
+    <main class="auth-shell">
+        <aside class="auth-story">
+            <x-brand />
+            <div><p class="eyebrow">SUA PRÓXIMA HISTÓRIA COMEÇA AQUI</p><h1>Mais histórias.<br>Menos <em>“em qual episódio parei?”</em></h1><p>Organize sua lista, encontre novas histórias e acompanhe tudo no seu ritmo.</p><div class="auth-visual" aria-hidden="true"><span><x-icon name="book" /></span><span><x-icon name="play" /></span><span><x-icon name="star" /></span></div></div>
+            <p class="text-xs">Um lugar para quem sempre tem mais um anime na lista.</p>
+        </aside>
+        <section class="auth-form-side"><div class="auth-form-box"><div class="mb-10 lg:hidden"><x-brand /></div>{{ $slot }}</div></section>
+    </main>
+</body></html>

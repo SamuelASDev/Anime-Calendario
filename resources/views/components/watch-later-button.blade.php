@@ -1,9 +1,14 @@
 @props(['anime', 'status' => null])
+@php
+    if (auth()->check()) {
+        if (! request()->attributes->has('viewer_watch_statuses')) {
+            request()->attributes->set('viewer_watch_statuses', \App\Models\WatchPlan::ownedBy(auth()->id())->pluck('watch_status', 'anime_id'));
+        }
+        $status = request()->attributes->get('viewer_watch_statuses')->get($anime->id, $status);
+    }
+@endphp
 @if($status === 'pretendo_assistir')
-    <a href="{{ route('personal.watch-later.index') }}" class="inline-block rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">✓ Pretendo assistir</a>
+    <a href="{{ route('personal.watch-later.index') }}" class="btn btn-secondary btn-sm">✓ Pretendo assistir</a>
 @elseif($status === null)
-    <form method="POST" action="{{ route('personal.watch-later.store', $anime) }}">
-        @csrf
-        <button class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-200 hover:bg-amber-500/20">＋ Pretendo assistir</button>
-    </form>
+    <form method="POST" action="{{ route('personal.watch-later.store', $anime) }}">@csrf<button class="btn btn-secondary btn-sm"><x-icon name="bookmark" />Pretendo assistir</button></form>
 @endif

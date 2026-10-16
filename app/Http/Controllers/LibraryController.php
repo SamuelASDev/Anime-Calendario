@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ListingFiltersRequest;
 use App\Http\Requests\ReviewRequest;
 use App\Models\Anime;
 use App\Models\User;
 use App\Models\UserAnimeMeta;
 use App\Models\WatchPlan;
+use App\Queries\WatchPlanQuery;
+use App\Services\Library\CollectionOrder;
 use App\Services\Library\RankingManager;
 use App\Services\Planning\PlanManager;
 use Illuminate\Http\Request;
@@ -14,10 +17,18 @@ use Illuminate\Support\Facades\DB;
 
 class LibraryController extends Controller
 {
-    public function watchLaterIndex(Request $request)
+    public function moveCollection(Request $request, Anime $anime, CollectionOrder $order)
     {
-        $plans = WatchPlan::ownedBy($request->user()->id)->where('watch_status', 'pretendo_assistir')
-            ->with('anime')->latest('updated_at')->paginate(12);
+        $data = $request->validate(['collection' => ['required', 'in:favorites,completed'], 'direction' => ['required', 'in:up,down']]);
+        $order->move($request->user(), $anime->id, $data['collection'], $data['direction']);
+
+        return back()->with('success', 'Ordem da coleção atualizada.');
+    }
+
+    public function watchLaterIndex(ListingFiltersRequest $request, WatchPlanQuery $query)
+    {
+        $plans = $query->filtered($request->user()->id, $request->validated())->where('watch_status', 'pretendo_assistir')
+            ->paginate(12)->withQueryString();
 
         return view('personal.watch-later', compact('plans'));
     }

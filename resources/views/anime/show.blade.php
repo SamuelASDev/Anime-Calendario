@@ -1,150 +1,27 @@
 <x-app-layout>
-    <div class="max-w-5xl mx-auto p-4 sm:p-6 text-white">
-
-        <div class="mb-6 flex items-center justify-between gap-3">
-            <a href="{{ url()->previous() }}"
-               class="text-sm text-gray-400 hover:text-white transition">
-                ← Voltar
-            </a>
-        </div>
-
-        @if(session('success'))
-            <div class="mb-4 rounded-lg border border-green-700 bg-green-900/40 px-4 py-3 text-sm text-green-300">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <div class="mb-5 flex flex-wrap items-center gap-3">
-            <x-watch-later-button :anime="$anime" :status="$myPlanStatus" />
-            @if($myPlanStatus === null || $myPlanStatus === 'pretendo_assistir')
-                <a href="{{ route('personal.watch-plans.create', $anime) }}" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm">Começar a assistir</a>
-            @else
-                <a href="{{ route('personal.animes.index') }}" class="text-sm text-indigo-300">Ver na minha biblioteca</a>
-            @endif
-        </div>
-
-        <div class="bg-gray-800 rounded-lg p-4 sm:p-6 shadow-md border border-gray-700">
-
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex-shrink-0">
-                    <img src="{{ $anime->image }}"
-                         alt="{{ $anime->title }}"
-                         class="w-48 rounded-lg shadow">
+    <x-slot:title>{{ $anime->title }} · Anime Tracker</x-slot:title>
+    <div class="page-wrap">
+        <div class="flex items-center justify-between mb-6"><a class="btn btn-quiet btn-sm" href="{{ route('anime.index.all') }}">← Voltar ao catálogo</a>@if(auth()->user()->isAdmin())<a class="btn btn-secondary btn-sm" href="{{ route('anime.synopsis.edit', $anime) }}"><x-icon name="settings" />Editar sinopse</a>@endif</div>
+        @if(session('success'))<p class="flash" role="status">{{ session('success') }}</p>@endif
+        <section class="detail-hero">
+            @if($anime->image)<img class="detail-poster" src="{{ $anime->image }}" alt="Capa de {{ $anime->title }}" width="300" height="420">@endif
+            <div class="detail-info">
+                <p class="eyebrow">CADA ANIME, UM NOVO MUNDO</p><h1>{{ $anime->title }}</h1>
+                <div class="genre-list">@foreach(array_filter(array_map('trim', explode(',', $anime->genres ?? ''))) as $genre)<a href="{{ route('anime.index.all', ['genre' => $genre]) }}">{{ $genre }}</a>@endforeach</div>
+                <div class="detail-meta"><div>Episódios<strong>{{ $anime->episodes ?? 'Ainda não definido' }}</strong></div><div>Exibição<strong>{{ ['Currently Airing' => 'Em exibição', 'Finished Airing' => 'Finalizado', 'Not yet aired' => 'Ainda não estreou'][$anime->anime_status] ?? ($anime->anime_status ?: 'Não informado') }}</strong></div>@if($myPlanStatus)<div>Na sua lista<strong><x-status-badge :status="$myPlanStatus" /></strong></div>@endif</div>
+                <div class="hero-actions">
+                    @if($myPlanStatus === null || $myPlanStatus === 'pretendo_assistir')<a class="btn btn-primary" href="{{ route('personal.watch-plans.create', $anime) }}"><x-icon name="play" />Começar a assistir</a><x-watch-later-button :anime="$anime" :status="$myPlanStatus" />
+                    @elseif($myPlanStatus === 'concluido')<a class="btn btn-primary" href="{{ route('personal.completed.review.create', $anime) }}"><x-icon name="star" />Escrever avaliação</a>
+                    @else<a class="btn btn-primary" href="{{ route('personal.animes.index', ['q' => $anime->title]) }}"><x-icon name="book" />Ver na minha biblioteca</a>@endif
+                    @if($myPlanStatus !== 'concluido')<form method="POST" action="{{ route('completed.mark-watched', $anime) }}">@csrf<button class="btn btn-secondary"><x-icon name="check" />Já assisti</button></form>@endif
                 </div>
-
-                <div class="flex-1">
-                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                        <h1 class="text-2xl sm:text-3xl font-bold">
-                            {{ $anime->title }}
-                        </h1>
-
-                        @auth
-                            @if(auth()->user()->isAdmin())
-<a href="{{ route('anime.synopsis.edit', $anime->id) }}"
-                               class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition">
-                                Editar sinopse
-                            </a>
-@endif
-                        @endauth
-                    </div>
-
-                    <div class="mt-3 space-y-2 text-sm text-gray-300">
-
-                        
-                        @if($anime->genres)
-                            <div class="flex flex-wrap gap-2">
-                                @foreach(explode(',', $anime->genres) as $genre)
-                                    <span class="px-2 py-1 text-xs rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                                        {{ trim($genre) }}
-                                    </span>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        <p>
-                            <span class="text-white font-semibold">Episódios:</span>
-                            {{ $anime->episodes ?? 'Não definido' }}
-                        </p>
-
-                        <p>
-                            <span class="text-white font-semibold">Status:</span>
-                            {{ $anime->anime_status ?? 'Não definido' }}
-                        </p>
-                    </div>
-
-                    <div class="mt-6">
-                        <div class="flex items-center justify-between gap-3 mb-2">
-                            <h2 class="text-lg font-semibold text-indigo-300">
-                                Sinopse
-                            </h2>
-                        </div>
-
-                        <div class="bg-gray-900 border border-gray-700 rounded p-4 text-sm text-gray-300 leading-relaxed whitespace-pre-line">
-                            {{ $anime->synopsis ?? 'Sem sinopse disponível.' }}
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-sm font-semibold mt-8">Sinopse</h2><p class="detail-synopsis">{{ $anime->synopsis_pt ?: ($anime->synopsis ?: 'Esta história ainda não tem uma sinopse cadastrada.') }}</p>
             </div>
-
-            <div class="mt-8 border-t border-gray-700 pt-6">
-                <h2 class="text-xl font-bold mb-4 text-blue-300">
-                    Reviews
-                </h2>
-
-                @if($reviews->count())
-                    <div class="space-y-4">
-                        @foreach($reviews as $meta)
-                            <div class="bg-gray-900 border border-gray-700 rounded p-4">
-                                <div class="flex items-center justify-between gap-3 mb-2">
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-10 w-10 rounded-full overflow-hidden border border-white/10 bg-zinc-800 shrink-0">
-                                            @if($meta->user->profile_photo_url)
-                                                <img 
-                                                    src="{{ $meta->user->profile_photo_url }}"
-                                                    alt="{{ $meta->user->name }}"
-                                                    class="h-full w-full object-cover"
-                                                >
-                                            @else
-                                                <div class="h-full w-full flex items-center justify-center bg-violet-500 font-bold text-sm">
-                                                    {{ strtoupper(substr($meta->user->name, 0, 1)) }}
-                                                </div>
-                                            @endif
-                                        </div>
-
-                                        <p class="font-semibold text-white">
-                                            {{ $meta->user->name }}
-                                        </p>
-                                    </div>
-
-                                    @if($meta->updated_at)
-                                        <p class="text-xs text-gray-400">
-                                            {{ $meta->updated_at->format('d/m/Y H:i') }}
-                                        </p>
-                                    @endif
-                                </div>
-
-                                @if($meta->rating)
-                                    <p class="text-sm text-yellow-300 mb-2">
-                                        Nota: {{ $meta->rating }}/10
-                                    </p>
-                                @endif
-
-                                @if($meta->comment)
-                                    <p class="text-sm text-gray-300 break-words whitespace-pre-line">
-                                        {{ $meta->comment }}
-                                    </p>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="mt-5">{{ $reviews->links() }}</div>
-                @else
-                    <div class="bg-gray-900 border border-gray-700 rounded p-4 text-gray-300">
-                        Nenhuma review ainda.
-                    </div>
-                @endif
-            </div>
-
-        </div>
+        </section>
+        <section id="reviews">
+            <div class="section-heading"><div><h2><x-icon name="star" />O que a comunidade achou<span class="section-count">{{ $reviews->total() }}</span></h2><p>Notas e impressões de quem viveu essa história.</p></div></div>
+            <div class="horizontal-grid">@forelse($reviews as $meta)<article class="review-card"><div class="review-header">@if($meta->user->profile_photo_url)<img src="{{ $meta->user->profile_photo_url }}" alt="">@else<span class="review-avatar">{{ mb_strtoupper(mb_substr($meta->user->name, 0, 1)) }}</span>@endif<div><a class="review-user" href="{{ $meta->user->username ? route('profile.show', $meta->user->username) : route('users.index') }}">{{ $meta->user->name }}</a><div class="review-date">{{ $meta->updated_at->format('d/m/Y') }}</div></div>@if($meta->rating)<span class="status-tag ml-auto text-amber-200"><x-icon name="star" class="w-3 h-3" />{{ $meta->rating }}/10</span>@endif</div>@if($meta->comment)<p>{{ $meta->comment }}</p>@endif</article>@empty<div class="col-span-full"><x-empty-state title="Essa história ainda não tem avaliações" description="Depois de concluir o anime, compartilhe suas impressões com a comunidade." icon="star" /></div>@endforelse</div>
+            <div class="mt-7">{{ $reviews->links() }}</div>
+        </section>
     </div>
 </x-app-layout>

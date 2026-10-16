@@ -1,38 +1,9 @@
 <x-app-layout>
-    <div class="max-w-6xl mx-auto p-4 sm:p-6 text-white">
-
-        <h1 class="text-2xl font-bold mb-6">Usuários</h1>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            @foreach($users as $user)
-                <a href="{{ route('profile.show', $user->username) }}"
-                   class="bg-zinc-900 border border-white/10 rounded-xl p-4 hover:bg-zinc-800 transition">
-
-                    <div class="flex items-center gap-3">
-                        <div class="h-10 w-10 rounded-full overflow-hidden border border-white/10 bg-zinc-800 shrink-0">
-                            @if($user->profile_photo_url)
-                                <img 
-                                    src="{{ $user->profile_photo_url }}"
-                                    alt="{{ $user->name }}"
-                                    class="h-full w-full object-cover"
-                                >
-                            @else
-                                <div class="h-full w-full flex items-center justify-center bg-violet-500 font-bold">
-                                    {{ strtoupper(substr($user->name, 0, 1)) }}
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="min-w-0">
-                            <p class="font-semibold truncate">{{ $user->name }}</p>
-                            <p class="text-sm text-zinc-400 truncate">{{ '@'.$user->username }}</p>
-                        </div>
-                    </div>
-
-                </a>
-            @endforeach
-        </div>
-
+    <div class="page-wrap">
+        <x-page-heading eyebrow="HISTÓRIAS MELHORES QUANDO COMPARTILHADAS" title="Pessoas da comunidade" description="Conheça outras coleções, encontre favoritos em comum e descubra novas recomendações." />
+        <form method="GET" class="filter-panel" role="search" aria-label="Buscar pessoas"><div class="filter-primary"><div class="search-field"><x-icon name="search" /><input aria-label="Nome ou usuário" type="search" name="q" value="{{ request('q') }}" placeholder="Buscar pelo nome ou @usuário…" maxlength="200"></div><label class="filter-sort"><select name="sort" aria-label="Ordenar pessoas"><option value="name" @selected(request('sort', 'name') === 'name')>Nome: A–Z</option><option value="recent" @selected(request('sort') === 'recent')>Novos na comunidade</option></select></label><button class="btn btn-primary">Buscar pessoas</button>@if(request('q'))<a class="btn btn-quiet" href="{{ route('users.index') }}">Limpar</a>@endif</div></form>
+        <x-validation-summary />
+        <div class="user-grid">@forelse($users as $user)<a class="community-user" href="{{ route('profile.show', $user->username) }}">@if($user->profile_photo_url)<img loading="lazy" src="{{ $user->profile_photo_url }}" alt="">@else<span class="community-avatar">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>@endif<div class="min-w-0"><h2 class="truncate">{{ $user->name }}</h2><p class="truncate">{{ '@'.$user->username }}</p></div><x-icon name="arrow" class="ml-auto text-slate-600" /></a>@empty<div class="col-span-full"><x-empty-state title="Nenhuma pessoa encontrada" description="Tente outro nome ou nome de usuário." icon="users" /></div>@endforelse</div>
+        <div class="mt-8">{{ $users->links() }}</div>
     </div>
-    <div class="max-w-6xl mx-auto px-6 pb-6">{{ $users->links() }}</div>
 </x-app-layout>

@@ -108,6 +108,7 @@ class PlanProjection
             $entries[] = [
                 'date' => $key, 'date_formatted' => $date->format('d/m/Y'),
                 'anime_title' => $plan->anime->title, 'anime_image' => $plan->anime->image,
+                'anime_id' => $plan->anime_id,
                 'label' => match ($type) {
                     'variable' => "Ep atual: {$episode} - A definir",
                     'missed' => 'Sem episódios assistidos',

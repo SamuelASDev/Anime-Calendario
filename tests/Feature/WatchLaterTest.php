@@ -75,10 +75,10 @@ test('catalog and details show the saved status and search offers direct save fo
     $anime = laterAnime();
     $this->actingAs($user)->get(route('anime.show', $anime))->assertOk()->assertSee(route('personal.watch-later.store', $anime));
     app(PlanManager::class)->saveForLater($anime, $user);
-    $this->get(route('anime.index.all'))->assertOk()->assertSee('✓ Pretendo assistir')->assertDontSee('>Assistindo<', false);
+    $this->get(route('anime.index.all'))->assertOk()->assertSee('✓ Pretendo assistir')->assertSee('status-pretendo_assistir', false)->assertDontSee('status-assistindo', false);
     $this->get(route('anime.show', $anime))->assertOk()->assertSee('✓ Pretendo assistir');
     Http::preventStrayRequests();
-    Http::fake(['api.jikan.moe/*' => Http::response(['data' => [['mal_id' => 1234, 'title' => 'Futuro', 'images' => ['jpg' => ['image_url' => 'https://example.test/cover.jpg']]]]])]);
+    Http::fake(['api.tenrai.org/*' => Http::response(['data' => [['mal_id' => 1234, 'title' => 'Futuro', 'images' => ['jpg' => ['image_url' => 'https://example.test/cover.jpg']]]]])]);
     $this->get(route('anime.search', ['q' => 'futuro']))->assertOk()->assertSee('name="target" value="later"', false);
 });
 

@@ -10,5 +10,5 @@
     <input type="hidden" name="image" value="{{ $anime['images']['jpg']['image_url'] }}">
     <input type="hidden" name="genres" value="{{ $allTags }}">
     <input type="hidden" name="target" value="{{ $target }}">
-    <button class="{{ $target === 'later' ? 'bg-amber-600 hover:bg-amber-500' : 'bg-indigo-600 hover:bg-indigo-500' }} text-white text-sm px-3 py-2 rounded-lg w-full">{{ match ($target) { 'global' => 'Adicionar à comunidade', 'later' => 'Pretendo assistir', default => 'Adicionar à minha biblioteca' } }}</button>
+    <button class="btn btn-secondary btn-sm w-full">{{ match ($target) { 'global' => 'Adicionar à comunidade', 'later' => 'Pretendo assistir', default => 'Adicionar à minha biblioteca' } }}</button>
 </form>

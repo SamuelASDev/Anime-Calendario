@@ -3,29 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImportAnimeRequest;
+use App\Http\Requests\ListingFiltersRequest;
 use App\Models\Anime;
 use App\Models\WatchPlan;
 use App\Queries\AnimeCatalogQuery;
-use App\Services\JikanService;
+use App\Services\AnimeSearchService;
 use App\Services\Planning\PlanManager;
 use Illuminate\Http\Request;
 
 class AnimeController extends Controller
 {
-    public function search(Request $request, JikanService $jikan)
+    public function search(Request $request, AnimeSearchService $catalogSearch)
     {
         $data = $request->validate(['q' => ['nullable', 'string', 'max:200']]);
         $results = [];
         $searchError = null;
         if (! empty($data['q'])) {
             try {
-                $results = $jikan->search($data['q']);
+                $results = $catalogSearch->search($data['q']);
             } catch (\RuntimeException $exception) {
                 $searchError = 'A busca está indisponível no momento. Tente novamente em instantes.';
             }
         }
 
-        return view('anime.search', compact('results', 'searchError'));
+        $localAnimes = Anime::whereIn('mal_id', collect($results)->pluck('mal_id'))->pluck('id', 'mal_id');
+
+        return view('anime.search', compact('results', 'searchError', 'localAnimes'));
     }
 
     public function store(ImportAnimeRequest $request, PlanManager $manager)
@@ -68,15 +71,15 @@ class AnimeController extends Controller
     public function updateSynopsis(Request $request, Anime $anime)
     {
         abort_unless($request->user()->isAdmin(), 403);
-        $anime->update($request->validate(['synopsis' => ['nullable', 'string', 'max:20000']]));
+        $data = $request->validate(['synopsis' => ['nullable', 'string', 'max:20000']]);
+        $anime->update([filled($anime->synopsis_pt) ? 'synopsis_pt' : 'synopsis' => $data['synopsis']]);
 
         return redirect()->route('anime.show', $anime)->with('success', 'Sinopse atualizada.');
     }
 
-    public function allAnimeIndex(Request $request, AnimeCatalogQuery $catalog)
+    public function allAnimeIndex(ListingFiltersRequest $request, AnimeCatalogQuery $catalog)
     {
-        $data = $request->validate(['q' => ['nullable', 'string', 'max:200']]);
-        $animes = $catalog->paginate($data['q'] ?? null);
+        $animes = $catalog->paginate($request->validated(), $request->user()->id);
         $statuses = WatchPlan::ownedBy($request->user()->id)->pluck('watch_status', 'anime_id');
         $myPlanStatuses = $statuses->all();
         $myWatchingAnimeIds = $statuses->filter(fn ($status) => in_array($status, ['assistindo', 'pausado']))->keys()->all();

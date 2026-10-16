@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ListingFiltersRequest;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Requests\UpdatePublicProfileRequest;
 use App\Models\User;
@@ -73,12 +74,12 @@ class ProfileController extends Controller
         return redirect()->route('profile.edit')->with('success', 'Perfil atualizado com sucesso.');
     }
 
-    public function show(string $username, ProfileQuery $profiles)
+    public function show(string $username, ProfileQuery $profiles, ListingFiltersRequest $request)
     {
         $user = User::where('username', $username)->firstOrFail();
         $owner = auth()->id() === $user->id;
         abort_unless($user->is_public || $owner, 403);
 
-        return view('profile.show', $profiles->sections($user, $owner));
+        return view('profile.show', $profiles->sections($user, $owner, $request->validated()));
     }
 }

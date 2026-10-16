@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Planning;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConfirmHistoryRequest;
+use App\Http\Requests\ListingFiltersRequest;
 use App\Http\Requests\SaveWatchPlanRequest;
 use App\Http\Requests\WatchLogRequest;
 use App\Models\Anime;
@@ -40,9 +41,9 @@ abstract class PlanController extends Controller
         return $this->personal ? 'personal.animes.index' : 'admin.animes.index';
     }
 
-    public function index(Request $request)
+    public function index(ListingFiltersRequest $request)
     {
-        $pages = $this->plans->statusPages($this->ownerId());
+        $pages = $this->plans->statusPages($this->ownerId(), filters: $request->validated());
 
         return view($this->personal ? 'personal.index' : 'admin.animes.index', [
             'plans' => $pages['active'], 'activePlans' => $pages['active'],
@@ -167,13 +168,13 @@ abstract class PlanController extends Controller
         return redirect()->route($this->personal ? 'personal.history' : 'history')->with('success', 'Histórico atualizado.');
     }
 
-    public function completed()
+    public function completed(ListingFiltersRequest $request)
     {
-        $plans = $this->plans->loaded($this->ownerId())->with(['anime' => fn ($q) => $q
+        $plans = $this->plans->filtered($this->ownerId(), $request->validated())->with(['anime' => fn ($q) => $q
             ->with('latestPublicReview.user')
             ->with(['userMeta' => fn ($meta) => $meta->where('user_id', auth()->id())])
             ->withAvg(['userMeta as public_rating' => fn ($meta) => $meta->publiclyVisible()], 'rating')])
-            ->where('watch_status', 'concluido')->latest('updated_at')->paginate(12);
+            ->where('watch_status', 'concluido')->paginate(12)->withQueryString();
         $myCompletedAnimeIds = WatchPlan::ownedBy(auth()->id())->where('watch_status', 'concluido')->pluck('anime_id')->all();
 
         return view($this->personal ? 'personal.completed' : 'completed.index', compact('plans', 'myCompletedAnimeIds'));

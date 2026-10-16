@@ -1,20 +1,12 @@
 <x-app-layout>
-    <div class="max-w-2xl mx-auto p-6 text-white">
-        <h1 class="text-2xl font-bold mb-6">Registrar episódios · {{ $plan->anime->title }}</h1>
-        <form class="rounded-xl border border-gray-700 bg-gray-800 p-6 space-y-5" method="POST" action="{{ route($routePrefix.'.log.store', $plan) }}">
-            @csrf
-            <x-validation-summary />
-            <label class="block">Data
-                <input class="form-field" name="watched_date" type="date" required min="{{ $plan->start_date }}" max="{{ today()->toDateString() }}" value="{{ old('watched_date', request('date', today()->toDateString())) }}">
-            </label>
-            <label class="block">Episódios assistidos neste dia
-                <input class="form-field" name="episodes_watched_today" type="number" min="0" max="100000" required value="{{ old('episodes_watched_today', 1) }}">
-            </label>
-            <label class="block">Observações
-                <textarea class="form-field" name="notes" maxlength="2000">{{ old('notes') }}</textarea>
-            </label>
-            <p class="text-sm text-gray-400">Este registro substitui a previsão ou o registro anterior da mesma data.</p>
-            <button class="rounded-lg bg-indigo-600 px-5 py-3 font-semibold">Salvar registro</button>
+    <div class="page-wrap max-w-3xl">
+        <x-page-heading eyebrow="MAIS UM CAPÍTULO NA CONTA" title="Registrar episódios" :description="$plan->anime->title" />
+        <form class="surface p-6 sm:p-8 space-y-6" method="POST" action="{{ route($routePrefix.'.log.store', $plan) }}">@csrf<x-validation-summary />
+            <label class="block text-sm text-slate-300">Em qual dia?<input class="form-field" name="watched_date" type="date" required min="{{ $plan->start_date }}" max="{{ today()->toDateString() }}" value="{{ old('watched_date', request('date', today()->toDateString())) }}"></label>
+            <label class="block text-sm text-slate-300">Quantos episódios assistiu?<input class="form-field" name="episodes_watched_today" type="number" min="0" max="100000" required value="{{ old('episodes_watched_today', 1) }}"></label>
+            <label class="block text-sm text-slate-300">Observações <span class="text-slate-600">(opcional)</span><textarea class="form-field" name="notes" rows="4" maxlength="2000" placeholder="Alguma lembrança desse dia?">{{ old('notes') }}</textarea></label>
+            <p class="card-note">Este registro substitui a previsão ou o registro anterior da mesma data. Use zero se não assistiu nesse dia.</p>
+            <div class="flex gap-3"><button class="btn btn-primary"><x-icon name="check" />Salvar registro</button><a class="btn btn-secondary" href="{{ route($routePrefix.'.index') }}">Cancelar</a></div>
         </form>
     </div>
 </x-app-layout>

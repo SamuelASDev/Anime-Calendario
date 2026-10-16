@@ -1,36 +1,17 @@
 <!DOCTYPE html>
-<html class="dark" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>Anime Tracker</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            @include('layouts.navigation')
-
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-    </body>
+<html class="dark" lang="pt-BR">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#0c0f16"><title>{{ $title ?? 'Anime Tracker · Sua próxima história' }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] btn btn-primary">Pular para o conteúdo</a>
+    @include('layouts.navigation')
+    <main id="main-content" class="app-main" tabindex="-1">
+        @isset($header)<header class="page-wrap pb-0">{{ $header }}</header>@endisset
+        {{ $slot }}
+    </main>
+    <footer class="site-footer"><span>Anime Tracker / Um episódio de cada vez.</span><span>Sua lista. Seu ritmo. Suas histórias.</span></footer>
+</body>
 </html>

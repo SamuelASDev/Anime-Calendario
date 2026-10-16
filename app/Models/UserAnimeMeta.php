@@ -26,6 +26,8 @@ class UserAnimeMeta extends Model
         'comment',
         'is_favorite',
         'top_position',
+        'favorite_position',
+        'completed_position',
     ];
 
     public function user()

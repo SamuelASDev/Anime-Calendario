@@ -2,19 +2,80 @@
 
 Última atualização: 2026-10-15.
 
-Branch de trabalho atual: `dev`. Ela recebeu todos os commits locais da `main` até `109d3f7`; a reformulação e as alterações desta sessão estão reunidas no commit desta entrega. O stash de segurança foi mantido.
+Branch de trabalho atual: `dev`, acompanhando origin/dev. A base da reformulação foi enviada no commit 532b0ad. As alterações de identidade visual, cards e filtros estão locais, ainda sem commit/push; o stash antigo foi mantido como backup.
 
 ## Ponto de retomada
 
+**Busca externa restaurada:** migração para Tenrai v1 concluída. AnimeSearchService usa services.anime_catalog.base_url, padrão https://api.tenrai.org/v1. Busca real pelo PHP e pela tela do Edge confirmou resultados e capas de Naruto. A API pública antiga da Jikan foi encerrada em 01/10/2026; o histórico do diagnóstico foi preservado abaixo.
+
 **Concluído:** reformulação modular documentada em PLANO_DE_REFORMULACAO.md e implementada. Controllers delegam às camadas de Requests/Policies/Queries/Services; agenda/progresso têm motor compartilhado; banco local migrado sem limpeza; telas de planejamento e perfil compartilham componentes.
 
-**Validação atual:** 66 testes aprovados, 273 assertions, após ajustar o início de Pretendo assistir para abrir o formulário do plano. Build e validações finais registrados abaixo. MySQL local preservado: 21 usuários, 16 animes, 217 planos. O plano adicional e um metadado adicional já existiam no backup anterior à reformulação.
+**Validação atual:** 82 testes aprovados, 363 assertions, após migração da busca para Tenrai. Build e validações finais registrados abaixo. MySQL local preservado: 21 usuários, 16 animes, 217 planos. O plano adicional e um metadado adicional já existiam no backup anterior à reformulação.
 
-**Última entrega:** status Pretendo assistir disponível no catálogo, busca, detalhes, biblioteca e perfil do proprietário. Lista própria em /me/watch-later; espera não avança episódios.
+**Última entrega:** identidade visual compartilhada, perfil inspirado nas referências com quatro estatísticas, cards navegáveis e filtros nas listagens. Pretendo assistir e seu fluxo de configuração foram preservados.
 
-**Próximos trabalhos opcionais:** teste visual em navegador e acessibilidade, benchmark de volume, localização completa PT-BR, verificação obrigatória de e-mail se desejada e integração de CI executada no remoto. Nenhuma dessas tarefas está em andamento. A revisão P01–P24 abaixo descreve a baseline antiga; consulte a tabela de resolução no final antes de tratá-los como problemas atuais.
+**Próximos trabalhos opcionais:** ampliar a revisão visual e auditar acessibilidade, benchmark de volume, localização completa PT-BR, verificação obrigatória de e-mail se desejada e integração de CI executada no remoto. A revisão inicial em Edge desktop e viewport móvel foi concluída e registrada abaixo. Nenhuma dessas tarefas está em andamento. A revisão P01–P24 abaixo descreve a baseline antiga; consulte a tabela de resolução no final antes de tratá-los como problemas atuais.
+
+### 2026-10-15 — Revisão visual no Edge — concluído
+
+- Pedido: tentar visualizar as telas usando o Edge após a falha anterior do navegador integrado.
+- Antes: entrega visual validada por build/testes/HTTP, sem inspeção visual real.
+- Verificação: acesso a `http://127.0.0.1:8000`, autenticação com conta de demonstração e screenshots de entrada, painel, perfil, catálogo, detalhes e biblioteca. Exercitados busca por título, link do card para detalhes e Começar a assistir abrindo Novo planejamento; cancelamento sem salvar.
+- Responsividade: viewport 390 × 844 na biblioteca e perfil, menu móvel aberto e navegação para Meu perfil. Banner/avatar visíveis carregados; largura do conteúdo do perfil 375 px em viewport 390 px, sem transbordamento da página. Navegação de seções com rolagem própria. Viewport restaurado ao final.
+- Resultado: nenhum defeito visual bloqueador encontrado nesta amostra. Sem alterações no código da aplicação ou nos dados de domínio; apenas registro neste diário e em DESIGN_SYSTEM.md. Não houve novo build/teste automatizado, pois a aplicação não foi modificada.
+- Pendências opcionais: ampliar a matriz de dispositivos e realizar auditoria de teclado, contraste e leitor de tela. Alterações visuais anteriores continuam locais, sem novo commit/push.
 
 ## Como usar este diário
+
+### 2026-10-15 — Estrela amarela nos favoritos — concluído
+
+- Pedido: destacar o símbolo de favorito enquanto o card estiver no bloco Favoritos.
+- resources/css/cards.css: estrela do botão com aria-pressed=true em favorite-card recebe amarelo e preenchimento. Estado continua vindo do banco e da atualização por Fetch.
+- Verificação: build Vite e git diff --check aprovados. Alteração apenas visual, sem novos testes ou alterações no banco.
+
+
+### 2026-10-15 — Capas dos favoritos no padrão compartilhado — concluído
+
+- Pedido: voltar as capas de Favoritos ao padrão dos outros cards, pois o recorte observado vinha das imagens horizontais de teste.
+- Removidos poster-wrap-landscape e a detecção de /demo/covers/ no componente profile-anime-card; removidas as regras de proporção/fundo/enquadramento específicas de favoritos em cards.css. Capas agora herdam poster-wrap (3/3.8, cover e hover) dos demais pôsteres. Ordenação e controles preservados.
+- Validação: build Vite aprovado, compilação Blade aprovada e cache de views limpo, git diff --check aprovado. Sem novo teste automatizado para esta alteração visual simples.
+- DESIGN_SYSTEM.md atualizado. Histórico dos ajustes anteriores preservado abaixo; a exceção de formato demo foi substituída. Sem commit/push.
+
+
+### 2026-10-15 — Migração da busca para Tenrai — concluído
+
+- Pedido: tentar Tenrai após encerramento da API pública Jikan.
+- Teste real inicial pelo Http do Laravel/PHP local retornou HTTP 200, Naruto (MAL 20), Naruto x Ninkuu (MAL 54688), episódios e capas no formato esperado.
+- JikanService renomeado para AnimeSearchService; controller atualizado. Endpoint vem de config/services.php e ANIME_CATALOG_BASE_URL, com padrão Tenrai v1; .env.example documentado, sem necessidade de alterar .env local. Cache inclui endpoint e título normalizado, preservando TTL de 10 minutos; exceções geram log com host/tipo/código, sem consulta do usuário. config:clear executado.
+- Tela de busca identifica MyAnimeList / Tenrai. IDs MAL, contrato de importação e dados existentes preservados. Nenhum anime foi importado durante o teste manual.
+- Verificação: busca Naruto pela interface do Edge retornou 10 resultados, incluindo Naruto e Shippuuden; screenshot confirmou capas carregadas e botões de biblioteca/espera/comunidade. 82 testes/363 assertions; Pint; git diff --check. Testes novos verificam cache por endpoint/normalização, resposta inválida e recuperação sem cachear falha. Nenhuma referência a JikanService ou api.jikan.moe permanece em app/tests/config. Sem alterações de CSS/JS, portanto nenhum novo build necessário.
+- Arquivos: AnimeSearchService, AnimeController, config/services.php, .env.example, anime/search, CatalogAndProfilesTest, WatchLaterTest, README e diário. Sem commit/push nesta entrega. Próximo passo opcional: acompanhar limites e disponibilidade do novo provedor em produção.
+
+### 2026-10-15 — Diagnóstico de indisponibilidade da Jikan — concluído; migração pendente
+
+- Pedido: verificar se a Jikan funciona, pois a busca do site falha.
+- Reproduzido pelo PHP/Laravel local: requisição HTTPS a /v4/anime?q=Naruto&limit=2 falhou com ConnectionException/cURL 28 (timeout de conexão). curl.exe IPv4 e IPv6 também falharam por timeout. DNS respondeu; configuração de CA está definida no PHP. Não foi desativada a validação TLS.
+- Confirmado anúncio do próprio mantenedor no repositório oficial, issue 613, publicado em 10/10/2026: API pública encerrada em 01/10/2026; recomenda instância privada ou migração. URL: https://github.com/jikan-me/jikan-rest/issues/613.
+- Código atual: JikanService aponta diretamente para api.jikan.moe e AnimeController exibe mensagem genérica temporária. Testes anteriores de integração usam Http::fake e não validavam disponibilidade real do provedor.
+- Sem mudança no código da aplicação, banco ou ambiente. Próximo passo concreto: escolher e integrar um substituto ou uma instância própria, preservando os IDs MAL e o contrato de importação. Diagnóstico concluído; busca externa continua indisponível.
+
+### 2026-10-15 — Ordenação independente e capas harmônicas — concluído
+
+- Correção do entendimento anterior: as setas de Favoritos e Concluídos ordenam suas próprias coleções, sem alterar o Top 10. A entrada anterior descreve o comportamento substituído.
+- Migration incremental 2026_10_16_000001 adiciona favorite_position/completed_position nullable a user_anime_meta, executada no MySQL local sem apagar dados. CollectionOrder serializa mudanças pelo usuário em transação, valida pertencimento à coleção e troca posições adjacentes; sem limite de 10 nessas listas. A ordem é aplicada antes dos filtros/paginação. Valores nulos usam desempate estável por ID até a primeira ordenação.
+- Nova rota autenticada personal.animes.collection-order; controller valida coleção/direção; ProfileQuery lê as ordens independentes. Componente recebe collection e mostra rótulos correspondentes; posições Top 10 não aparecem sobre cards de outros blocos. Fetch existente substitui somente fragmentos com conteúdo alterado.
+- Favoritos: removidas faixas de contain; imagens horizontais de demonstração têm espaço 4:3 e imagens normais de pôster usam 3:4 com preenchimento centralizado. Cards ficaram mais compactos com controles alinhados.
+- Validação: 80 testes, 354 assertions; Pint; build Vite; git diff --check. Novos testes verificam independência das três ordens, autorização e validação. Edge: mover Guardioes da Lua em Favoritos alterou apenas Favoritos; Top 10 e Concluídos permaneceram iguais. Ordem inicial restaurada pelo botão Subir; posições de favoritos ficam normalizadas no banco. Screenshot final conferido sem cortes/faixas nas capas demo.
+- Arquivos principais: CollectionOrder, LibraryController, ProfileQuery, UserAnimeMeta, migration, routes/planning, profile/show, profile-anime-card, cards.css e ListingUsabilityTest. Sem commit/push nesta entrega.
+
+### 2026-10-15 — Feedback de controles e capas — concluído
+
+- Corrigido componente watch-later-button: consulta os status da conta autenticada uma vez por requisição, inclusive em cards de comunidade/perfis de terceiros; não oferece salvar para depois se o anime já estiver assistindo, pausado ou concluído.
+- profile-anime-card recebe contexto sortable: setas de Top 10 apenas em Top 10, Favoritos e Concluídos, nunca Assistindo ou Avaliações. As setas continuam alterando a posição no Top 10, explicitada no nome acessível; não foi criada ordenação independente de favoritos/concluídos.
+- Fetch em resources/js/app.js intercepta ações de favorito e Top 10 nas coleções do perfil, mantém CSRF/rotas/transações existentes e usa o HTML Blade retornado após o salvamento para sincronizar apenas seções alteradas, indicadores e navegação. Mantém rolagem, bloqueia submissões simultâneas e apresenta erro sem recarregar. Formulários continuam funcionando sem JavaScript. Nenhuma dependência nova.
+- Capas de favoritos usam contain centralizado, preservando toda a imagem horizontal de demonstração dentro do espaço vertical, com faixas de fundo quando necessário.
+- Validação: 78 testes/335 assertions; build Vite; Pint; diff check. No Edge, Descer Guardioes da Lua mudou a ordem pelo Fetch e mostrou Coleção atualizada; Subir restaurou a ordem inicial. Conferidos zero controles de ordenação em Assistindo e screenshot dos favoritos com imagens inteiras. Nenhuma alteração permanente de posição deixada pelo teste.
+- Arquivos: componentes watch-later-button/profile-anime-card, profile/show, cards.css, app.js, ListingUsabilityTest e documentação. Sem commit/push nesta entrega.
 
 1. Leia o ponto de retomada, os problemas e a última entrada do histórico.
 2. Confira `git status --short`, código e ambiente: este documento é um retrato, não uma consulta em tempo real.
@@ -283,3 +344,19 @@ Próximo passo:
 - **Verificação:** diff sem erros de whitespace; conteúdo restaurado conferido com o stash na etapa anterior. A última validação funcional foi de 66 testes aprovados e 273 assertions; não houve mudança funcional depois dela.
 - **Mensagem:** refactor: modulariza aplicacao e adiciona lista para assistir depois.
 - **Escopo:** commit local na dev; sem push. Backup privado, .env, vendor, node_modules e assets de build permanecem ignorados.
+
+### 2026-10-15 — Identidade visual, cards e filtros — concluído
+
+- **Pedido:** cards que abram detalhes, mais filtros nas listagens, perfil inspirado nas três referências locais e visual profissional consistente em todas as telas.
+- **Antes:** cards tinham navegação principalmente pelo título, listagens com poucos filtros, perfil sem os quatro indicadores visuais e identidade de componentes ainda próxima ao Breeze.
+- **Referências:** imagens 1.png, 2.png e 3.png da pasta imagens perfil, inspecionadas. Mantidos os princípios de banner, avatar integrado, contadores e capas; a composição nova não copia a antiga.
+- **Identidade:** tokens de grafite/violeta, tipografia de sistema sem serviço externo, botões/campos unificados, SVGs internos, navegação desktop/móvel, paginação própria, foco visível, link para pular conteúdo e movimento reduzido. CSS dividido em foundation/chrome/cards/pages/responsive com ordem explícita. DESIGN_SYSTEM.md registra convenções.
+- **Cards:** links HTML nativos com área ampliada via pseudo-elemento; ações em camada independente, sem links envolvendo formulários nem JS que capture todos os cliques. Aplicados ao catálogo, perfil, biblioteca, dashboard, concluídos e timelines. Busca Jikan abre detalhe local quando o título já existe; títulos ainda não importados abrem MyAnimeList, explicitamente indicado.
+- **Perfil:** banner amplo, avatar sobreposto, estatísticas clicáveis de favoritos/assistindo/concluídos/em espera, Top 10 horizontal e favoritos com capas verticais. Totais calculados na coleção inteira e independentes de filtros/páginas; indicadores privados são ocultados. Espera permanece só do proprietário. Filtros por título/gênero e âncoras de seção.
+- **Filtros:** ListingFiltersRequest + AnimeFilters compartilhado. Catálogo filtra título, gênero, status próprio/fora da lista, favoritos, exibição e duração; ordena por inclusão/título/média pública/episódios. Biblioteca e concluídos usam título/gênero/favoritos/ordenação; biblioteca tem abas por status. Espera e diretório de pessoas também filtram. Nenhum filtro usa dados privados de terceiros. Paginação preserva parâmetros e retorna à seção correta.
+- **Telas:** layouts autenticado/visitante, página inicial, dashboard, perfil, catálogo, busca, detalhes, biblioteca, concluídos, espera, calendário, histórico, planejamento, logs, avaliações, sinopse, configurações e autenticação receberam o tratamento comum.
+- **Detalhe de sinopse:** exibição prioriza texto PT quando existente; editor salva o campo efetivamente exibido para que a alteração seja visível, mantendo a sinopse original quando há tradução.
+- **Validação:** 76 testes aprovados, 329 assertions; dez testes novos de filtros/ordenação/isolamento e edição da sinopse exibida, paginação, estatísticas/privacidade, links nativos e busca de pessoas. Teste anterior de status foi ajustado para checar o badge do card em vez do texto global, pois o seletor de filtros agora contém todos os status. Build aprovado; Pint e git diff --check aprovados; views compiladas. Verificação no kernel HTTP com MySQL em 30 cenários retornou 200, incluindo filtros e permissões de usuário comum. Snapshot confirmou planos intactos.
+- **Limite visual concreto:** navegador indisponível em cua.getBrowser e cua.createBrowserTab(iab). Por isso não foi possível conferir screenshots/gestos reais; não houve substituição por automação não autorizada. Testes HTTP/DOM e compilação não equivalem a inspeção visual completa.
+- **Dados:** nenhuma migration, reseed, exclusão ou alteração das contas e planos locais; nenhum commit/push nesta etapa. O aviso antigo de Browserslist permanece no build.
+- **Próximo passo opcional:** conferir desktop/mobile no navegador e ajustar refinamentos visuais com feedback real; recursos solicitados estão implementados e validados funcionalmente.
