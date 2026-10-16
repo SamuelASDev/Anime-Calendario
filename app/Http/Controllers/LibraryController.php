@@ -22,7 +22,7 @@ class LibraryController extends Controller
         $data = $request->validate(['collection' => ['required', 'in:favorites,completed'], 'direction' => ['required', 'in:up,down']]);
         $order->move($request->user(), $anime->id, $data['collection'], $data['direction']);
 
-        return back()->with('success', 'Ordem da coleção atualizada.');
+        return $this->mutationResponse('Ordem da coleção atualizada.', [$data['collection']]);
     }
 
     public function watchLaterIndex(ListingFiltersRequest $request, WatchPlanQuery $query)
@@ -80,7 +80,7 @@ class LibraryController extends Controller
             $meta->update(['is_favorite' => ! $meta->is_favorite]);
         });
 
-        return back()->with('success', 'Favorito atualizado.');
+        return $this->mutationResponse('Favorito atualizado.', ['favorites', 'stats', 'top10', 'watching', 'completed']);
     }
 
     public function updateTopPosition(Request $request, Anime $anime, RankingManager $ranking)
@@ -88,7 +88,7 @@ class LibraryController extends Controller
         $data = $request->validate(['top_position' => ['nullable', 'integer', 'min:1', 'max:10']]);
         $ranking->change($request->user(), $anime->id, 'position', $data['top_position'] ?? null);
 
-        return back()->with('success', 'Top 10 atualizado.');
+        return $this->mutationResponse('Top 10 atualizado.', ['top10', 'nav', 'favorites', 'watching', 'completed']);
     }
 
     public function addToTop(Anime $anime, RankingManager $ranking)
@@ -115,6 +115,15 @@ class LibraryController extends Controller
     {
         $ranking->change(auth()->user(), $anime->id, $action);
 
-        return back()->with('success', 'Top 10 atualizado.');
+        return $this->mutationResponse('Top 10 atualizado.', ['top10', 'nav', 'favorites', 'watching', 'completed']);
+    }
+
+    private function mutationResponse(string $message, array $blocks)
+    {
+        if (request()->expectsJson()) {
+            return response()->json(['message' => $message, 'blocks' => $blocks]);
+        }
+
+        return back()->with('success', $message);
     }
 }

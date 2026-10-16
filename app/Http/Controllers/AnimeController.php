@@ -26,9 +26,9 @@ class AnimeController extends Controller
             }
         }
 
-        $localAnimes = Anime::whereIn('mal_id', collect($results)->pluck('mal_id'))->pluck('id', 'mal_id');
+        $localAnimes = Anime::whereIn('mal_id', collect($results)->pluck('malId'))->pluck('id', 'mal_id');
 
-        return view('anime.search', compact('results', 'searchError', 'localAnimes'));
+        return view('anime.search', ['catalogSource' => $catalogSearch->sourceName()] + compact('results', 'searchError', 'localAnimes'));
     }
 
     public function store(ImportAnimeRequest $request, PlanManager $manager)

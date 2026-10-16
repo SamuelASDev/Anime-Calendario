@@ -27,3 +27,20 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: composer check
+      - run: php scripts/benchmark-collections.php > storage/logs/collection-benchmark.json
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failures
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: collection-benchmark
+          path: storage/logs/collection-benchmark.json
+          if-no-files-found: ignore

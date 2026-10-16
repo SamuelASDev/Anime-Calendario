@@ -80,6 +80,22 @@ class ProfileController extends Controller
         $owner = auth()->id() === $user->id;
         abort_unless($user->is_public || $owner, 403);
 
+        if ($request->expectsJson()) {
+            $data = $request->validate([
+                'blocks' => ['required', 'array', 'min:1', 'max:8'],
+                'blocks.*' => ['required', 'in:top10,favorites,watching,completed,planned,reviews,stats,nav'],
+            ]);
+            $blocks = array_unique($data['blocks']);
+            $request->query->remove('blocks');
+            $context = $profiles->sections($user, $owner, $request->validated(), $blocks) + ['owner' => $owner];
+            $fragments = [];
+            foreach ($blocks as $block) {
+                $fragments[$block] = view('profile.collections.'.$block, $context)->render();
+            }
+
+            return response()->json(['fragments' => $fragments]);
+        }
+
         return view('profile.show', $profiles->sections($user, $owner, $request->validated()));
     }
 }

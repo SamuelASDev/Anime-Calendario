@@ -30,6 +30,8 @@ Favoritos usam o mesmo poster-wrap dos demais cards: proporção 3/3.8, object-f
 
 Componentes principais: `anime-poster`, `plan-card`, `profile-anime-card`, `status-badge`, `profile-stat`, `timeline-entry`, `list-filters`, `page-heading`, `empty-state` e `icon`. Ícones são SVGs estáticos internos, sem biblioteca ou serviço externo.
 
+`collection-order-button` concentra as setas e seus rótulos. O perfil usa parciais em `profile/collections`, compartilhados pela página e pela resposta JSON de fragmentos. O módulo `resources/js/collections/profile.js` envia a mutação, lê somente os blocos indicados e preserva rolagem/foco. O Top 10 mantém um elemento raiz oculto quando vazio, permitindo recriar o bloco sem navegação. Expiração de sessão e falha de atualização após salvar têm mensagens distintas. Dados externos de busca chegam aos templates como `CatalogAnime`, sem acesso ao JSON específico da Tenrai.
+
 ## Filtros e navegação
 
 - Catálogo: título, gênero, status pessoal, fora da lista, favoritos, situação de exibição, duração e ordenação por inclusão/título/média pública/episódios.

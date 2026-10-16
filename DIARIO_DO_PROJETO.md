@@ -2,7 +2,7 @@
 
 Última atualização: 2026-10-15.
 
-Branch de trabalho atual: `dev`, acompanhando origin/dev. A base da reformulação foi enviada no commit 532b0ad. As alterações de identidade visual, cards e filtros estão locais, ainda sem commit/push; o stash antigo foi mantido como backup.
+Branch de trabalho atual: `dev`, acompanhando origin/dev. Baseline desta etapa: `2e4d6b1` (layout do site definido), já publicada e com CI verde. A etapa de fragmentos, ordenação eficiente, normalização e validação está sendo publicada para confirmar a nova CI; o stash antigo foi mantido como backup.
 
 ## Ponto de retomada
 
@@ -10,7 +10,7 @@ Branch de trabalho atual: `dev`, acompanhando origin/dev. A base da reformulaç�
 
 **Concluído:** reformulação modular documentada em PLANO_DE_REFORMULACAO.md e implementada. Controllers delegam às camadas de Requests/Policies/Queries/Services; agenda/progresso têm motor compartilhado; banco local migrado sem limpeza; telas de planejamento e perfil compartilham componentes.
 
-**Validação atual:** 82 testes aprovados, 363 assertions, após migração da busca para Tenrai. Build e validações finais registrados abaixo. MySQL local preservado: 21 usuários, 16 animes, 217 planos. O plano adicional e um metadado adicional já existiam no backup anterior à reformulação.
+**Validação atual:** 87 testes de backend/394 assertions e 7 testes Playwright aprovados localmente; build e Pint aprovados. Benchmark de 100/1.000/10.000 itens mantém 7 consultas e 2 gravações por movimento (resultados em PERFORMANCE.md). MySQL local preservado; smoke de ordenação com BIGINT executado com fixtures totalmente revertidas por rollback.
 
 **Última entrega:** identidade visual compartilhada, perfil inspirado nas referências com quatro estatísticas, cards navegáveis e filtros nas listagens. Pretendo assistir e seu fluxo de configuração foram preservados.
 
@@ -26,6 +26,19 @@ Branch de trabalho atual: `dev`, acompanhando origin/dev. A base da reformulaç�
 - Pendências opcionais: ampliar a matriz de dispositivos e realizar auditoria de teclado, contraste e leitor de tela. Alterações visuais anteriores continuam locais, sem novo commit/push.
 
 ## Como usar este diário
+
+### 2026-10-15 — Fragmentos, ordenação eficiente e validação — concluído localmente; CI remota em verificação
+
+- Pedido: implementar os cinco pontos da avaliação estrutural: respostas específicas por bloco, ordenar sem regravar coleções, melhorar templates, normalizar API e ampliar validação de produção.
+- Perfil: mutações retornam JSON com mensagem/blocos; GET autenticado com Accept JSON e blocks[] devolve somente os parciais permitidos. ProfileQuery consulta apenas as coleções solicitadas; privacidade/filtros/paginação preservados. Parâmetros de fragmento não contaminam os links de paginação. JS modular em collections/profile.js; erro após salvar informa que o banco foi atualizado. Top 10 vazio mantém raiz oculta para poder reaparecer.
+- Ordenação: CollectionOrder consulta item/vizinho e grava só dois registros. Posições virtuais estáveis preservam a ordem dos itens com posição nula, sem inicializar toda a coleção. Migration 000002 amplia colunas para BIGINT e adiciona índice, aplicada incrementalmente ao MySQL. Bloqueio por usuário mantém serialização. Top 10 continua com limite dez. Consulta ainda depende do volume; não alegar tempo constante.
+- Templates: perfil extraído em profile/collections; botões de ordenação extraídos em collection-order-button. Componentes de cards, filtros, importação, busca e navegação reformatados. Formulário convencional de copiar agenda não é interceptado pelo protocolo de mutações da biblioteca.
+- Catálogo: AnimeCatalogProvider + DTO CatalogAnime + TenraiProvider. Somente o adaptador conhece JSON externo; telas/controlador trabalham com campos internos. Cache inclui versão/identidade do provedor. Rótulo de fonte vem do adaptador. Teste substitui Tenrai por provedor fake sem mudar templates; normalização de campos inválidos/nulos coberta.
+- Testes de navegador: Playwright/Chromium, servidor porta 8011 e SQLite temporário exclusivo com chave própria; nunca MySQL/.env. Sete cenários cobrem ordenação independente/persistência, Top 10 vazio/recriação, favoritos/indicadores, celular/filtros/detalhes, sessão expirada e falha de fragmentos após salvar. Relatórios ignorados pelo Git e publicados pela CI em falhas.
+- Verificação local: 87 testes/394 assertions; 7 testes de navegador; build; Pint; Blade compilado; diff check. Smoke MySQL confirmou ordens BIGINT para duas listas em transação revertida. Nenhum domínio local foi apagado/resemeado.
+- Benchmark isolado: 20 movimentos/cenário com 100/1.000/10.000 itens, máximo 7 consultas/2 gravações em todos. Medianas a 10.000 itens: favoritos 2,089 ms, concluídos 6,842 ms; pico 32 MB. SQLite em memória, não representa carga MySQL de produção. Script reproduzível e PERFORMANCE.md adicionados.
+- Dependências: Playwright adicionado; atualizações compatíveis do lockfile aplicadas. Formatador Blade foi usado uma vez e removido das dependências; auditoria npm após correções compatíveis ainda aponta 7 avisos em dependências de desenvolvimento ligadas ao Tailwind 3 (sem upgrade forçado para Tailwind 4 nesta etapa).
+- CI: baseline 2e4d6b1 confirmada verde em https://github.com/SamuelASDev/Anime-Calendario/actions/runs/38835763101. Workflow ampliado para benchmark/Playwright/artefatos; execução do novo commit será registrada ao concluir. Próximos trabalhos opcionais: carga concorrente em MySQL descartável e auditoria de acessibilidade completa.
 
 ### 2026-10-15 — Estrela amarela nos favoritos — concluído
 

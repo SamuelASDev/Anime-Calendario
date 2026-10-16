@@ -18,6 +18,9 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/framework/testing/
+/playwright-report/
+/test-results/
 /vendor
 Homestead.json
 Homestead.yaml

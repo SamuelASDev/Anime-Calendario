@@ -64,13 +64,22 @@ O status **Pretendo assistir** guarda animes para depois, sem iniciar progresso,
 ~~~powershell
 composer check
 npm run build
+npx playwright install chromium
+npm run test:browser
+php scripts/benchmark-collections.php
 ~~~
 
 composer check executa Laravel Pint e Pest/PHPUnit. phpunit.xml usa SQLite em memória, cache e sessão em array e e-mail em array; não aponta para o MySQL de desenvolvimento. Os testes de busca externa usam HTTP fake, sem rede. CI está definida em .github/workflows/checks.yml.
 
+Os testes de navegador usam Playwright/Chromium e um servidor exclusivo na porta 8011 (ou `E2E_PORT`), com SQLite temporário em `storage/framework/testing`, chave de aplicação própria e fixtures dedicadas. Eles não reutilizam o servidor ou o MySQL de desenvolvimento. Relatórios e traces ficam em `playwright-report`/`test-results`, ignorados pelo Git. A CI também executa esses testes e publica artefatos em caso de falha.
+
+O benchmark cria um banco SQLite em memória no próprio processo e mede movimentos em coleções de 100, 1.000 e 10.000 itens. Ver `PERFORMANCE.md` para resultados e limites da medição; não é teste de carga de produção.
+
 ### Busca externa de animes
 
-A busca usa a Tenrai v1 (`https://api.tenrai.org/v1`), compatível com os campos e IDs MyAnimeList usados na importação. O serviço `AnimeSearchService` mantém cache de 10 minutos por endpoint/título, limites de conexão/resposta e mensagem amigável quando a origem falha. Falhas são registradas no log sem incluir o título pesquisado. O endereço pode ser configurado com `ANIME_CATALOG_BASE_URL` (veja `.env.example`); após trocar uma configuração em cache, execute `php artisan config:clear`. Alterar apenas a URL exige um provedor compatível com o formato Jikan v4. A API pública antiga da Jikan foi encerrada em outubro de 2026.
+A busca usa a Tenrai v1 (`https://api.tenrai.org/v1`). `AnimeCatalogProvider` define o contrato e `TenraiProvider` converte os campos externos para `CatalogAnime`, formato interno consumido pelo controller e pelos templates. Uma nova integração implementa esse contrato e troca o binding em `AppServiceProvider`, sem modificar as telas. Ela deve fornecer o ID MAL para preservar a identidade dos animes já importados.
+
+`AnimeSearchService` mantém cache de 10 minutos por identidade do provedor/título e mensagem amigável quando a origem falha. O adaptador Tenrai configura limites de conexão/resposta. Falhas são registradas no log sem incluir o título pesquisado. O endereço pode ser configurado com `ANIME_CATALOG_BASE_URL` (veja `.env.example`); após trocar uma configuração em cache, execute `php artisan config:clear`. Alterar apenas a URL exige um provedor compatível com Tenrai/Jikan v4. A API pública antiga da Jikan foi encerrada em outubro de 2026.
 
 Consulte PLANO_DE_REFORMULACAO.md para a estratégia e DIARIO_DO_PROJETO.md para o estado de execução, histórico, resultados e limitações. AGENTS.md orienta sessões futuras a manter esses registros.
 
@@ -81,3 +90,5 @@ As telas compartilham uma identidade escura com capas em destaque, acentos viole
 Os cards locais abrem os detalhes do anime ao clicar na capa ou na área do card. Botões como iniciar, favoritar e remover continuam independentes. O catálogo oferece filtros por título, gênero, status pessoal, favoritos, exibição e duração, além de ordenação. Biblioteca, concluídos, espera e perfil também têm filtros próprios; a paginação preserva as escolhas.
 
 Consulte DESIGN_SYSTEM.md para os tokens, componentes, comportamento dos cards e convenções visuais.
+
+As ações das coleções do perfil enviam POST/PATCH com CSRF e recebem JSON com a mensagem e os blocos afetados. Uma leitura autenticada do perfil com `Accept: application/json` e `blocks[]` retorna somente os parciais solicitados, com os mesmos filtros, paginação e regras de privacidade. O HTML completo usa esses mesmos parciais. Sem JavaScript, os formulários continuam redirecionando normalmente.
