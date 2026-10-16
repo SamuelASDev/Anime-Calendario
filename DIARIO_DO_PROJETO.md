@@ -27,13 +27,13 @@ Branch de trabalho atual: `main`, acompanhando origin/main. A `dev` foi integrad
 
 ## Como usar este diário
 
-### 2026-10-15 — Correção da atualização legada em MariaDB — em validação remota
+### 2026-10-15 — Correção da atualização legada em MariaDB — concluído e publicado na main
 
 - Erro informado na implantação: 1901 ao adicionar owner_key STORED baseado em user_id. Causa: a FK legada ainda usava ON DELETE SET NULL; MariaDB impede coluna STORED baseada em campo que pode ser modificado por essa ação. A ordem anterior tentava criar a coluna antes de trocar a FK.
 - Migration 2026_10_15_000001 corrigida: alteração da FK para CASCADE em operação anterior à criação de owner_key; no down a coluna dependente é removida antes de restaurar SET NULL. Não muda a regra final prevista na reformulação. A mesma migration foi alterada porque ela falhou antes de ser registrada no servidor; uma nova migration posterior não resolveria o bloqueio.
 - Teste com banco descartável também revelou erro 1553 no down, pois InnoDB pode eliminar índices implícitos cobertos pelos novos índices compostos. Down agora garante índices simples das FKs antes de remover os compostos.
 - scripts/check-legacy-upgrade.php cria somente um schema temporário aleatório em servidor local, aplica migrations antigas, insere fixtures pessoais/globais, atualiza, compara dados, testa unicidade, down/up e cascata; sempre remove apenas o schema criado. Recusa host remoto. Executado com sucesso em MariaDB 10.4.32; banco local real preservado. Suíte SQLite: 87 testes/394 assertions; Pint aprovado.
-- CI ampliada com MariaDB 10.11 e MySQL 8.0 para esse teste de atualização legada. Resultado remoto será registrado após publicação. Nenhuma conexão ou alteração foi realizada no banco do servidor do usuário.
+- Correção publicada na main em 2f92169. CI ampliada com MariaDB 10.11 e MySQL 8.0 para esse teste de atualização legada: ambos aprovados, assim como o job completo de backend/build/benchmark/navegador, em https://github.com/SamuelASDev/Anime-Calendario/actions/runs/38838676830. Nenhuma conexão ou alteração foi realizada no banco do servidor do usuário. Registro final em commit de documentação adicional.
 - Instrução para a falha exata recebida: atualizar código da main e executar php artisan migrate --force novamente; não usar rollback, fresh ou limpeza de dados. Referência oficial: https://mariadb.com/docs/server/reference/sql-statements/data-definition/create/generated-columns.
 
 ### 2026-10-15 — Integração de dev em main — concluído
