@@ -1,6 +1,25 @@
 # Diário do Anime Calendar / Anime Tracker
 
-Última atualização: 2026-10-15.
+Última atualização: 2026-10-16.
+
+### 2026-10-16 — README para o GitHub e remoção do relatório — concluído
+
+- Pedido: apagar REVISAO_DO_PROJETO.md e apresentar o projeto com um README profissional no GitHub.
+- Antes: relatório não rastreado da revisão anterior; README técnico com referências a DESIGN_SYSTEM.md e PLANO_DE_REFORMULACAO.md, já excluídos localmente. Git na main; exclusões preexistentes preservadas.
+- Alterações: removido REVISAO_DO_PROJETO.md; README.md refeito com identidade do projeto, logo existente, badge dinâmico do workflow, funcionalidades, stack, instalação, dados demo, arquitetura, integração, testes, implantação, contribuições e autoria. URL de clone confirmada no origin; contatos conferidos no rodapé existente. Removidas do README as referências aos documentos ausentes. Histórico da revisão anterior preservado neste diário.
+- Verificação: conteúdo conferido contra composer.json, package.json, configuração de testes/CI e .env.example já inspecionados; caminhos locais e diff/whitespace verificados. Não repetidos testes de aplicação ou build por ser alteração exclusivamente documental. Sem alteração no banco, código funcional, commit ou push.
+- Concluído: relatório removido e README preparado localmente. Próximo passo: revisar/publicar o diff quando solicitado; nenhuma publicação executada nesta etapa.
+
+### 2026-10-16 — Revisão técnica detalhada — concluída
+
+- Pedido: examinar o projeto detalhadamente. Estado real inicial: main em 25a9ba4 (rodapezin), com DESIGN_SYSTEM.md e PLANO_DE_REFORMULACAO.md já excluídos na árvore local. Exclusões preservadas; referências antigas de branch/commits abaixo são históricas.
+- Entrega: REVISAO_DO_PROJETO.md reúne arquitetura, pontos fortes, cinco achados priorizados, evidências, limites e próximos passos. Nenhuma correção funcional foi implementada nesta tarefa.
+- Confirmado em dois testes diagnósticos temporários com SQLite em memória: usuário comum consegue importar metadados adulterados para um MAL ID novo no catálogo compartilhado; editar agenda de um para dois episódios diários recalcula três dias anteriores, mudando progresso de 3 para 6. Dois testes/4 assertions aprovados confirmam esses comportamentos; arquivo temporário removido ao terminar.
+- Outros achados por leitura: calendário/histórico carregam todos os logs dos planos antes de aplicar a janela; composer setup regenera APP_KEY mesmo com .env existente; referências documentais apontam para os dois documentos excluídos. Não executado setup nem alterada APP_KEY.
+- Validação: backend 87 testes/394 assertions aprovados; Playwright 7 testes aprovados em SQLite temporário exclusivo; build Vite aprovado (60 módulos); Pint aprovado. phpunit.xml conferido com SQLite :memory: e cache de configuração ausente antes da suíte. Nenhuma alteração de dados no MySQL local, migrations, seeds, commit ou push.
+- Limites: sem teste de carga, auditoria online de dependências, consulta real ao provedor, envio de e-mail ou auditoria completa de acessibilidade; CI remota não consultada. Testes de navegador cobrem os sete cenários existentes, não toda a interface.
+- git diff --check aprovado ao encerrar. Arquivos desta entrega: REVISAO_DO_PROJETO.md e DIARIO_DO_PROJETO.md.
+- Concluído: inspeção e relatório. Pendente: corrigir/decidir os achados, pois o pedido foi de análise. Próximo passo concreto sugerido: proteger a origem dos metadados de importação no servidor e adicionar regressão de adulteração; depois definir a semântica da edição de agenda.
 
 Branch de trabalho atual: `main`, acompanhando origin/main. A `dev` foi integrada por fast-forward até `ea116d5`; implementação de fragmentos, ordenação eficiente, normalização e validação publicada em `2874ef9`, com CI remota verde. O registro desta integração é um commit de documentação adicional na main; o stash antigo foi mantido como backup.
 

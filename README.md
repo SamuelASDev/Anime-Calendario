@@ -1,96 +1,246 @@
-# Anime Calendar / Anime Tracker
+<div align="center">
+  <img src="public/images/logoSapo.png" alt="Logo do Anime Tracker" width="112">
 
-Aplicação Laravel para organizar animes, agendas semanais, progresso, avaliações, favoritos e Top 10. A comunidade tem uma agenda global administrada; cada conta mantém sua biblioteca pessoal.
+  <h1>Anime Tracker</h1>
 
-## Executar localmente
+  <p>Organize sua biblioteca, planeje seus episódios e acompanhe sua evolução.</p>
+  <p><strong>Um episódio de cada vez.</strong></p>
 
-Requisitos: PHP 8.2+, Composer, MySQL e Node compatível com Vite 7 (20.19+ ou 22.12+). Habilite PDO MySQL, PDO SQLite para testes, mbstring, fileinfo e as extensões exigidas pelo Composer.
+  <p>
+    <a href="https://github.com/SamuelASDev/Anime-Calendario/actions/workflows/checks.yml"><img src="https://github.com/SamuelASDev/Anime-Calendario/actions/workflows/checks.yml/badge.svg" alt="Status da integração contínua"></a>
+    <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.2 ou superior">
+    <img src="https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white" alt="Laravel 12">
+    <img src="https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS 3">
+  </p>
 
-Em uma instalação nova:
+  <p>
+    <a href="#funcionalidades">Funcionalidades</a> ·
+    <a href="#instalação">Instalação</a> ·
+    <a href="#arquitetura">Arquitetura</a> ·
+    <a href="#testes-e-qualidade">Testes</a> ·
+    <a href="#autor">Autor</a>
+  </p>
+</div>
 
-~~~powershell
+## Sobre o projeto
+
+O **Anime Tracker** é uma aplicação web para transformar sua lista de animes em uma rotina de acompanhamento. Reúna os títulos que pretende assistir, monte uma agenda semanal e registre os episódios vistos, com calendário, histórico e progresso em um só lugar.
+
+Além da biblioteca pessoal, a plataforma oferece uma comunidade autenticada com perfis, avaliações, favoritos, Top 10 e agendas compartilhadas pela administração. A interface utiliza tema escuro, capas em destaque e layouts responsivos.
+
+## Funcionalidades
+
+| Área | O que você pode fazer |
+| --- | --- |
+| **Catálogo** | Buscar animes na integração externa, importar títulos e consultar detalhes, capas, sinopses e gêneros. |
+| **Biblioteca pessoal** | Organizar títulos em Pretendo assistir, Assistindo, Pausado e Concluído. |
+| **Planejamento** | Definir a data de início, episódios já assistidos e uma agenda por dia da semana, incluindo dias de ritmo variável. |
+| **Acompanhamento** | Consultar progresso estimado, registrar episódios reais, pausar, retomar e concluir animes. |
+| **Calendário e histórico** | Visualizar a programação do próximo mês e consultar períodos de até 366 dias no histórico. |
+| **Coleções** | Avaliar animes concluídos, escrever comentários, marcar favoritos e organizar seu Top 10. |
+| **Perfil** | Personalizar avatar, banner e biografia, com controles de visibilidade das coleções. |
+| **Comunidade** | Descobrir pessoas, consultar coleções públicas e copiar agendas cuja visibilidade permita o acesso. |
+| **Administração** | Gerenciar os planos globais da comunidade e editar sinopses do catálogo. |
+
+As listagens oferecem filtros e paginação. No perfil, ações de favoritos e ordenação atualizam os blocos afetados sem recarregar a página inteira.
+
+### Como funciona o progresso
+
+- A agenda semanal gera uma previsão a partir da data de início do plano.
+- Um registro real substitui a previsão daquele dia, inclusive quando nenhum episódio foi assistido.
+- Dias variáveis sem registro não avançam o progresso automaticamente.
+- Intervalos de pausa interrompem o avanço previsto.
+- Títulos em **Pretendo assistir** só iniciam o acompanhamento depois que o planejamento é configurado e salvo.
+- A conclusão é uma ação explícita; consultar uma tela não altera o status no banco.
+
+## Tecnologias
+
+| Camada | Tecnologias |
+| --- | --- |
+| Backend | PHP 8.2+, Laravel 12, Eloquent e Laravel Breeze |
+| Interface | Blade, Alpine.js e Tailwind CSS 3 |
+| Build | Vite 7 e npm |
+| Banco de dados | MySQL; SQLite para testes isolados |
+| Catálogo externo | Adaptador Tenrai com identificadores MyAnimeList |
+| Qualidade | Pest, PHPUnit, Laravel Pint e Playwright |
+| Integração contínua | GitHub Actions, com verificações de aplicação e atualização de esquema em MySQL/MariaDB |
+
+## Instalação
+
+### Requisitos
+
+- PHP **8.2 ou superior**, Composer 2 e as extensões exigidas pelo Laravel.
+- Extensões `pdo_mysql`, `pdo_sqlite`, `mbstring` e `fileinfo` habilitadas.
+- MySQL disponível e um banco criado para a aplicação.
+- Node.js **20.19+ ou 22.12+**, com npm.
+- Git.
+
+### 1. Obtenha o código e instale as dependências
+
+```bash
+git clone https://github.com/SamuelASDev/Anime-Calendario.git
+cd Anime-Calendario
 composer install
 npm ci
-Copy-Item .env.example .env
+```
+
+### 2. Configure o ambiente
+
+Copie o arquivo de exemplo:
+
+```bash
+cp .env.example .env
+```
+
+No PowerShell, use `Copy-Item .env.example .env`.
+
+Ajuste o `.env` com a conexão do seu banco. Exemplo de configuração local:
+
+```dotenv
+APP_NAME="Anime Tracker"
+APP_URL=http://127.0.0.1:8000
+APP_TIMEZONE=America/Sao_Paulo
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=anime_calendar
+DB_USERNAME=seu_usuario
+DB_PASSWORD=sua_senha
+```
+
+Gere a chave **somente em uma instalação nova**, aplique as migrations e disponibilize os arquivos públicos:
+
+```bash
 php artisan key:generate
-# Ajuste a conexão MySQL no .env antes de migrar.
 php artisan migrate
 php artisan storage:link
+```
+
+> Ao atualizar uma instalação existente, preserve o `.env`, a `APP_KEY` e os dados. Utilize migrations incrementais; não execute `migrate:fresh` ou `db:wipe` para atualizar a aplicação.
+
+### 3. Inicie a aplicação
+
+Para desenvolvimento, execute:
+
+```bash
+composer dev
+```
+
+Esse comando inicia o servidor Laravel, o listener de filas e o Vite. Acesse **http://127.0.0.1:8000**.
+
+Para executar apenas o servidor com os assets compilados:
+
+```bash
 npm run build
 php artisan serve
-~~~
+```
 
-Acesse http://127.0.0.1:8000. O document root de uma hospedagem deve apontar para a pasta public. Fotos são servidas em /storage, sem /public na URL. Configure APP_URL para o endereço real e APP_TIMEZONE para o fuso desejado (padrão America/Sao_Paulo).
+### Dados de demonstração — opcionais
 
-Para desenvolvimento com atualização automática, use composer dev; também é possível executar php artisan serve e npm run dev em terminais separados. O comando Pail é opcional e não integra o script multiplataforma.
+Em ambiente `local` ou `testing`, você pode popular a aplicação com catálogo fictício, imagens locais, perfis e coleções:
 
-Em uma instalação existente, preserve .env e APP_KEY. Use migrations incrementais; não use migrate:fresh para atualizar este projeto com dados.
-
-## Dados de demonstração
-
-~~~powershell
+```bash
 php artisan db:seed
-~~~
+```
 
-DemoSeeder roda apenas em local/testing. Cria catálogo fictício com imagens locais, perfis públicos/privados, planos, logs, avaliações e rankings. Também promove o primeiro usuário existente a admin sem alterar sua senha. A reexecução completa registros ausentes e redefine perfis demo; não é uma limpeza do banco.
+O seeder cria a conta `admin@anime-calendar.test` e contas de demonstração de `usuario01@anime-calendar.test` a `usuario19@anime-calendar.test`. A senha de demonstração está definida em [DemoSeeder.php](database/seeders/DemoSeeder.php).
 
-Conta administrativa sintética: admin@anime-calendar.test. Contas comuns: usuario01@anime-calendar.test até usuario19@anime-calendar.test. A senha de demonstração está definida em database/seeders/DemoSeeder.php. Não utilizar essas contas em produção.
+> O seeder também promove o primeiro usuário existente a administrador e redefine os perfis de demonstração ao ser reexecutado. Utilize-o em uma instalação de desenvolvimento dedicada. As contas de demonstração não se destinam à produção.
 
 ## Arquitetura
 
-Monólito modular com Eloquent e injeção de dependências do Laravel:
+O projeto segue uma arquitetura de **monólito modular**, com responsabilidades separadas e componentes compartilhados entre os contextos pessoal e global.
 
-- routes/catalog.php, profiles.php, planning.php e admin.php: entradas de cada área; web.php compõe os módulos.
-- app/Http/Requests: validação de entrada e autorização de importação/avaliação.
-- app/Policies/WatchPlanPolicy.php: acesso a planos e cópia de agendas visíveis.
-- app/Services/Planning: motor de projeção sem escrita e operações transacionais de agenda, logs, pausa, conclusão e cópia.
-- app/Services/Library: atualização serializada do ranking; LibraryController coordena favoritos e avaliações.
-- app/Services/Profiles: persistência de uploads e limpeza após sucesso da alteração.
-- app/Queries: consultas reutilizáveis, paginação e agregações no banco.
-- resources/views/planning e components: apresentação compartilhada entre contexto global e pessoal.
+```text
+app/
+├── Contracts/           # Contratos de integração externa
+├── Data/                # Dados normalizados do catálogo
+├── Enums/               # Estados do domínio
+├── Http/
+│   ├── Controllers/     # Coordenação dos fluxos HTTP
+│   ├── Middleware/      # Controle de acesso administrativo
+│   └── Requests/        # Validação de entradas
+├── Models/              # Entidades e relacionamentos Eloquent
+├── Policies/            # Autorização de planos e cópias
+├── Queries/             # Filtros, paginação e consultas
+└── Services/
+    ├── Catalog/         # Adaptador do catálogo externo
+    ├── Library/         # Ranking e ordenação de coleções
+    ├── Planning/        # Agenda, projeção, logs e transições
+    └── Profiles/        # Perfil e ciclo de vida de uploads
+resources/
+├── css/                 # Estilos organizados por responsabilidade
+├── js/                  # Interações e atualização de coleções
+└── views/               # Páginas Blade e componentes reutilizáveis
+routes/                  # Rotas divididas por área da aplicação
+tests/
+├── Browser/             # Cenários Playwright
+├── Feature/             # Fluxos HTTP e regras de negócio
+└── Unit/                # Testes unitários
+```
 
-Controllers traduzem HTTP em chamadas ao domínio. Regras compartilhadas não devem ser copiadas para controllers ou Blade. Repositories que apenas espelham Eloquent não são necessários. Datas de plano são dias de calendário; logs reais substituem previsão; dias variados sem log não avançam. Pausas são intervalos de dias com fim exclusivo. Leituras nunca concluem planos no banco: conclusão é uma ação explícita.
+O `PlanProjection` concentra o cálculo de progresso, calendário e histórico. O `PlanManager` coordena gravações transacionais de agendas, registros, pausas e conclusões. A `WatchPlanPolicy` controla as operações permitidas sobre os planos.
 
-Planos globais têm user_id nulo. Planos pessoais têm proprietário. A coluna gerada owner_key permite unicidade também para os globais. Deletar uma conta apaga seus planos pessoais por cascata. A migração recusa dados duplicados; nenhuma deduplicação destrutiva é automática.
+Planos globais possuem `user_id` nulo; planos pessoais pertencem a uma conta. Essa separação é validada no servidor. As preferências de privacidade controlam a exposição das coleções e avaliações; perfis públicos são acessíveis dentro da comunidade autenticada.
 
-Perfis públicos são visíveis dentro da comunidade autenticada. Dados privados não podem ser copiados por terceiros. Reviews comunitárias respeitam is_public e show_reviews_public. E-mail permanece opcionalmente verificável; não há bloqueio obrigatório por verificação nesta versão.
+### Integração com o catálogo
 
-Calendário exibe o próximo mês; histórico permite consultar até 366 dias por vez, com período inicial de 90 dias. Progresso é calculado por semanas e exceções (logs/pausas), sem percorrer todos os dias desde o início em cada card.
+O contrato `AnimeCatalogProvider` separa a aplicação do formato da API externa. O adaptador converte os resultados para `CatalogAnime`, e o serviço de busca aplica cache de dez minutos, timeout e tratamento de falhas.
 
-O status **Pretendo assistir** guarda animes para depois, sem iniciar progresso, agenda ou histórico. Está disponível no catálogo, busca externa e detalhes, com lista em **Meu espaço → Pretendo assistir** e no próprio perfil (apenas para o dono). “Começar a assistir” abre o formulário para escolher a data e a agenda; o status só muda depois de salvar. Salvar de novo não duplica nem substitui o status de um anime que já está na biblioteca.
+O endpoint é configurável no `.env`:
 
-## Verificação
+```dotenv
+ANIME_CATALOG_BASE_URL=https://api.tenrai.org/v1
+```
 
-~~~powershell
+Os identificadores MyAnimeList são preservados na importação. A busca externa depende da disponibilidade do provedor; os testes automatizados desse fluxo utilizam respostas simuladas.
+
+## Testes e qualidade
+
+Execute as verificações de backend, estilo e build:
+
+```bash
 composer check
 npm run build
+```
+
+Para os testes de navegador:
+
+```bash
 npx playwright install chromium
 npm run test:browser
+```
+
+- **Backend:** Pest/PHPUnit com SQLite em memória, sessão/cache em array e e-mails sem envio real.
+- **Navegador:** Playwright com servidor exclusivo e banco SQLite temporário, separado do banco de desenvolvimento.
+- **Estilo:** Laravel Pint.
+- **CI:** [workflow Checks](.github/workflows/checks.yml), incluindo atualização de esquema legado em MariaDB 10.11 e MySQL 8.0.
+
+Para executar o benchmark isolado de ordenação:
+
+```bash
 php scripts/benchmark-collections.php
-~~~
+```
 
-composer check executa Laravel Pint e Pest/PHPUnit. phpunit.xml usa SQLite em memória, cache e sessão em array e e-mail em array; não aponta para o MySQL de desenvolvimento. Os testes de busca externa usam HTTP fake, sem rede. CI está definida em .github/workflows/checks.yml.
+O benchmark usa SQLite em memória. Metodologia, resultados e limites estão documentados em [PERFORMANCE.md](PERFORMANCE.md).
 
-Os testes de navegador usam Playwright/Chromium e um servidor exclusivo na porta 8011 (ou `E2E_PORT`), com SQLite temporário em `storage/framework/testing`, chave de aplicação própria e fixtures dedicadas. Eles não reutilizam o servidor ou o MySQL de desenvolvimento. Relatórios e traces ficam em `playwright-report`/`test-results`, ignorados pelo Git. A CI também executa esses testes e publica artefatos em caso de falha.
+## Implantação
 
-A CI também testa atualização de esquema legado com dados em MariaDB 10.11 e MySQL 8.0. `php scripts/check-legacy-upgrade.php` exige servidor local e permissão para criar um schema descartável; não migra o banco da aplicação. Se uma implantação falhou com erro 1901 ao criar `owner_key`, atualize para a versão corrigida e repita `php artisan migrate --force`: a FK legada deve passar de SET NULL para CASCADE antes da coluna gerada. Não é necessário resetar o banco ou executar rollback para essa falha.
+- Configure a raiz pública do servidor para o diretório `public/`.
+- Defina `APP_ENV=production`, `APP_DEBUG=false` e o endereço correto em `APP_URL`.
+- Configure banco, e-mail e serviços conforme o ambiente.
+- Preserve a chave da aplicação e mantenha backups antes de atualizações.
+- Disponibilize escrita em `storage/` e `bootstrap/cache/` e configure o vínculo de storage público.
+- Instale as dependências, compile os assets e aplique as migrations com `php artisan migrate --force`.
+- Caso utilize tarefas em fila, mantenha um worker supervisionado em execução.
 
-O benchmark cria um banco SQLite em memória no próprio processo e mede movimentos em coleções de 100, 1.000 e 10.000 itens. Ver `PERFORMANCE.md` para resultados e limites da medição; não é teste de carga de produção.
+## Contribuições
 
-### Busca externa de animes
+Sugestões e melhorias podem ser propostas pelas [issues](https://github.com/SamuelASDev/Anime-Calendario/issues) ou por pull requests. Descreva o problema, o comportamento esperado e as verificações realizadas. Antes de enviar mudanças, execute os checks correspondentes ao que foi alterado.
 
-A busca usa a Tenrai v1 (`https://api.tenrai.org/v1`). `AnimeCatalogProvider` define o contrato e `TenraiProvider` converte os campos externos para `CatalogAnime`, formato interno consumido pelo controller e pelos templates. Uma nova integração implementa esse contrato e troca o binding em `AppServiceProvider`, sem modificar as telas. Ela deve fornecer o ID MAL para preservar a identidade dos animes já importados.
+## Autor
 
-`AnimeSearchService` mantém cache de 10 minutos por identidade do provedor/título e mensagem amigável quando a origem falha. O adaptador Tenrai configura limites de conexão/resposta. Falhas são registradas no log sem incluir o título pesquisado. O endereço pode ser configurado com `ANIME_CATALOG_BASE_URL` (veja `.env.example`); após trocar uma configuração em cache, execute `php artisan config:clear`. Alterar apenas a URL exige um provedor compatível com Tenrai/Jikan v4. A API pública antiga da Jikan foi encerrada em outubro de 2026.
+Desenvolvido por **Samuel Abreu Sales**.
 
-Consulte PLANO_DE_REFORMULACAO.md para a estratégia e DIARIO_DO_PROJETO.md para o estado de execução, histórico, resultados e limitações. AGENTS.md orienta sessões futuras a manter esses registros.
-
-## Interface e filtros
-
-As telas compartilham uma identidade escura com capas em destaque, acentos violeta e componentes responsivos. O perfil tem banner, avatar e quatro indicadores da coleção: favoritos, assistindo, concluídos e em espera, respeitando a privacidade.
-
-Os cards locais abrem os detalhes do anime ao clicar na capa ou na área do card. Botões como iniciar, favoritar e remover continuam independentes. O catálogo oferece filtros por título, gênero, status pessoal, favoritos, exibição e duração, além de ordenação. Biblioteca, concluídos, espera e perfil também têm filtros próprios; a paginação preserva as escolhas.
-
-Consulte DESIGN_SYSTEM.md para os tokens, componentes, comportamento dos cards e convenções visuais.
-
-As ações das coleções do perfil enviam POST/PATCH com CSRF e recebem JSON com a mensagem e os blocos afetados. Uma leitura autenticada do perfil com `Accept: application/json` e `blocks[]` retorna somente os parciais solicitados, com os mesmos filtros, paginação e regras de privacidade. O HTML completo usa esses mesmos parciais. Sem JavaScript, os formulários continuam redirecionando normalmente.
+[GitHub](https://github.com/SamuelASDev) · [LinkedIn](https://www.linkedin.com/in/samuel-abreu-sales-3569592b5/) · [Portfólio](https://portifolio.froglabs.site/samuel-abreu-sales-eb72dded-0fee-446e-8b31-a46abf37dc2f#projetos)
