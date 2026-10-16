@@ -2,6 +2,26 @@
 
 Última atualização: 2026-10-16.
 
+### 2026-10-16 — Licença MIT — concluído
+
+- Pedido: gerar uma licença MIT para o projeto.
+- Antes: LICENSE ausente; composer.json já declarava MIT; diário com alteração local preexistente, preservada.
+- Alterações: criado LICENSE na raiz com texto padrão MIT em inglês e Copyright (c) 2026 Samuel Abreu Sales; README.md recebeu seção Licença com link para o arquivo. Texto conferido na Open Source Initiative: https://opensource.org/license/mit.
+- Verificação: conferidos nome/ano, link local, declaração MIT no Composer e git diff --check. Testes e build não repetidos por ser alteração exclusivamente documental.
+- Concluído: licença disponível localmente. Sem alteração funcional, banco, commit ou push. Próximo passo: incluir LICENSE, README e este registro no próximo commit quando solicitado.
+
+### 2026-10-16 — Descrição extensa e screenshots para o portfólio — concluído
+
+- Pedido: analisar profundamente o projeto, seguir a organização da página de referência do portfólio e entregar somente Descricao_Projeto.pdf e imagens/ dentro de projeto para portifolio/.
+- Antes: main em 783dbcd (read me), árvore limpa. Lidos diário e estado real; revisão atual de rotas, controllers, Requests, models, serviços, Queries, templates, JS/CSS, migrations, dependências, testes, scripts e CI, complementando a leitura detalhada da sessão anterior. Nenhuma funcionalidade foi alterada.
+- Referência: página /projects/1 do portfólio acessada no Edge e inspecionada por árvore de acessibilidade e screenshot. Ferramenta web não conseguiu abrir a URL; Edge funcionou. Adotados títulos de seção, subtítulos por responsabilidade, parágrafos desenvolvidos, destaques e imagens com legendas próximas dos recursos.
+- Aplicação: servidor local iniciado na porta 8000 e navegação no Edge usando somente a conta administrativa de demonstração existente. Capturadas 21 telas/estados reais; conversão de JPEG para PNG sem modificar o conteúdo visual. Busca real por Naruto retornou dez resultados com capas. Nenhuma importação, registro de episódios, alteração de agenda, ranking, perfil ou seed foi salva. A lista de espera foi capturada em seu estado vazio real, identificado na legenda.
+- Entrega: projeto para portifolio/Descricao_Projeto.pdf, 18 páginas, aproximadamente 6.682 palavras na fonte, texto selecionável com títulos/subtítulos/negritos/listas, 21 sinalizações e legendas. Pasta imagens/ com 21 PNGs numerados de acordo com a sequência do texto. PDF sem screenshots incorporados, capa, sumário, paginação, cabeçalho ou rodapé. Nenhum arquivo auxiliar dentro da pasta de entrega.
+- Conteúdo: produto, jornada e funcionalidades; tecnologias e papéis; arquitetura, modelo de dados, progresso/pausas/conclusão, privacidade e autorização; integração, transações, ordenação, uploads, fragmentos, testes e implantação. Distingue previsão de reprodução real e descreve limites efetivos da versão, sem afirmar recursos inexistentes.
+- Validação: 87 testes PHP/394 assertions aprovados; sete Playwright aprovados; build Vite aprovado (60 módulos); Pint aprovado. PDF renderizado com PyMuPDF e páginas conferidas visualmente, incluindo contato das 18 páginas e conferência ampliada da primeira/última; screenshots conferidos em contato visual. Texto extraído integralmente igual à fonte após remover somente marcação Markdown/espaços; acentos preservados; todos os blocos dentro das margens; zero imagens dentro do PDF. Conferidas numeração 01–21 e estrutura final contendo apenas PDF e diretório de imagens. git diff --check aprovado.
+- Limites: dependências de terceiros e binários não auditados linha a linha; sem pentest, carga concorrente, envio de e-mail ou nova consulta da CI remota. Testes usam seus próprios bancos SQLite; MySQL local e conta original preservados. Sem commit, push ou publicação no portfólio.
+- Concluído: material final pronto localmente. Próximo passo: copiar o texto e escolher as capturas no editor do portfólio; nenhuma publicação externa autorizada ou realizada nesta tarefa.
+
 ### 2026-10-16 — README para o GitHub e remoção do relatório — concluído
 
 - Pedido: apagar REVISAO_DO_PROJETO.md e apresentar o projeto com um README profissional no GitHub.

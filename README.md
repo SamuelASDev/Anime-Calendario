@@ -239,6 +239,12 @@ O benchmark usa SQLite em memória. Metodologia, resultados e limites estão doc
 
 Sugestões e melhorias podem ser propostas pelas [issues](https://github.com/SamuelASDev/Anime-Calendario/issues) ou por pull requests. Descreva o problema, o comportamento esperado e as verificações realizadas. Antes de enviar mudanças, execute os checks correspondentes ao que foi alterado.
 
+## Licença
+
+Este projeto está licenciado sob a [Licença MIT](LICENSE).
+
+Copyright (c) 2026 Samuel Abreu Sales.
+
 ## Autor
 
 Desenvolvido por **Samuel Abreu Sales**.
