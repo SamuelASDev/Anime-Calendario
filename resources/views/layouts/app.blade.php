@@ -12,6 +12,6 @@
         @isset($header)<header class="page-wrap pb-0">{{ $header }}</header>@endisset
         {{ $slot }}
     </main>
-    <footer class="site-footer"><span>Anime Tracker / Um episódio de cada vez.</span><span>Sua lista. Seu ritmo. Suas histórias.</span></footer>
+    <x-site-footer />
 </body>
 </html>

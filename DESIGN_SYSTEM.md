@@ -20,6 +20,8 @@ Tokens centrais: canvas `#0c0f16`, superfície `#141923`, texto `#edf0f7`, texto
 
 Use `btn`, `btn-primary`, `btn-secondary`, `btn-quiet`, `btn-danger` e `btn-sm` para ações; `form-field` para campos; `page-wrap`, `page-heading` e `section-heading` para estrutura. Evite voltar a introduzir paletas diferentes em cada tela.
 
+O componente `site-footer` é compartilhado entre área autenticada, entrada e autenticação: assinatura discreta do produto, crédito a Samuel Abreu Sales e links de contato com ícones internos. E-mail usa mailto; LinkedIn, portfólio e GitHub abrem em nova aba. No celular, os elementos ficam centralizados em coluna.
+
 ## Cards navegáveis
 
 O título é um link HTML real com classe `card-link`. Seu pseudo-elemento cobre o card inteiro. A área `card-actions` fica em uma camada superior, preservando botões, formulários e links independentes. Não envolver o card inteiro em outro link e não acrescentar um clique JavaScript ao article. Isso preserva Tab/Enter, abrir em nova aba e o comportamento dos controles.

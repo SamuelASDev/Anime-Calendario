@@ -10,4 +10,5 @@
         </aside>
         <section class="auth-form-side"><div class="auth-form-box"><div class="mb-10 lg:hidden"><x-brand /></div>{{ $slot }}</div></section>
     </main>
+    <x-site-footer />
 </body></html>

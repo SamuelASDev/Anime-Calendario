@@ -27,6 +27,14 @@ Branch de trabalho atual: `main`, acompanhando origin/main. A `dev` foi integrad
 
 ## Como usar este diário
 
+### 2026-10-15 — Rodapé com créditos e contato — concluído localmente
+
+- Pedido: rodapé harmônico com Desenvolvido por Samuel Abreu Sales e ícones para e-mail, LinkedIn, portfólio (globo) e GitHub, usando os destinos fornecidos pelo usuário.
+- Novo componente site-footer compartilhado em layouts/app, layouts/guest e welcome. E-mail usa mailto; os três sites abrem em nova aba com noopener/noreferrer, nomes acessíveis e títulos. Nenhuma mensagem foi enviada.
+- Ícones SVG internos mail/linkedin/globe/github adicionados; chrome.css define alinhamento em desktop e disposição centralizada em telas pequenas, mantendo a paleta do site.
+- Verificação: build Vite, compilação Blade e diff check aprovados. Edge indisponível nesta revisão; screenshots conferidos em Chromium automatizado a 1280×800 e 390×844, sem transbordamento no celular. Destinos dos quatro links conferidos pelo DOM sem abrir páginas externas. Previews locais em storage/app/private/previews/footer-desktop.png e footer-mobile.png. Sem novos testes para esta alteração visual simples.
+- Arquivos: site-footer, icon, layouts/app e guest, welcome e chrome.css. Sem alterações de banco, commit ou push nesta entrega.
+
 ### 2026-10-15 — Correção da atualização legada em MariaDB — concluído e publicado na main
 
 - Erro informado na implantação: 1901 ao adicionar owner_key STORED baseado em user_id. Causa: a FK legada ainda usava ON DELETE SET NULL; MariaDB impede coluna STORED baseada em campo que pode ser modificado por essa ação. A ordem anterior tentava criar a coluna antes de trocar a FK.
