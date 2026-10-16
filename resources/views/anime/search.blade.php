@@ -7,6 +7,8 @@
             </div>
         @endif
 
+        <x-validation-summary />
+        @if($searchError ?? null) <p role="alert" class="mb-4 rounded-lg bg-amber-950 border border-amber-700 p-4 text-amber-200">{{ $searchError }}</p> @endif
         <form method="GET" action="{{ route('anime.search') }}">
             <input
                 type="text"
@@ -38,63 +40,16 @@
                     </p>
 
                     <p class="text-xs sm:text-[10px] text-gray-400 line-clamp-1">
-                        {{ $anime['status'] }}
+                        {{ $anime['status'] ?? 'Não informado' }}
                     </p>
 
                     <div class="mt-2 space-y-2">
                         @if(auth()->user()?->role === 'admin')
-                            <form method="POST" action="{{ route('anime.store') }}">
-                                @csrf
-                                <input type="hidden" name="mal_id" value="{{ $anime['mal_id'] }}">
-                                <input type="hidden" name="title" value="{{ $anime['title'] }}">
-                                <input type="hidden" name="episodes" value="{{ $anime['episodes'] }}">
-                                <input type="hidden" name="synopsis" value="{{ $anime['synopsis'] }}">
-                                <input type="hidden" name="status" value="{{ $anime['status'] }}">
-                                <input type="hidden" name="image" value="{{ $anime['images']['jpg']['image_url'] }}">
-                                @php
-                                    $genres = collect($anime['genres'] ?? [])->pluck('name');
-                                    $themes = collect($anime['themes'] ?? [])->pluck('name');
-                                    $demographics = collect($anime['demographics'] ?? [])->pluck('name');
-
-                                    $allTags = $genres
-                                        ->merge($themes)
-                                        ->merge($demographics)
-                                        ->implode(', ');
-                                @endphp
-                                <input type="hidden" name="genres" value="{{ $allTags }}">
-                                <input type="hidden" name="target" value="global">
-
-                                <button class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded w-full">
-                                    ➕ Adicionar ao geral
-                                </button>
-                            </form>
+                            <x-anime-import-form :anime="$anime" target="global" />
                         @endif
 
-                        <form method="POST" action="{{ route('anime.store') }}">
-                            @csrf
-                            <input type="hidden" name="mal_id" value="{{ $anime['mal_id'] }}">
-                            <input type="hidden" name="title" value="{{ $anime['title'] }}">
-                            <input type="hidden" name="episodes" value="{{ $anime['episodes'] }}">
-                            <input type="hidden" name="synopsis" value="{{ $anime['synopsis'] }}">
-                            <input type="hidden" name="status" value="{{ $anime['status'] }}">
-                            <input type="hidden" name="image" value="{{ $anime['images']['jpg']['image_url'] }}">
-                            @php
-                                $genres = collect($anime['genres'] ?? [])->pluck('name');
-                                $themes = collect($anime['themes'] ?? [])->pluck('name');
-                                $demographics = collect($anime['demographics'] ?? [])->pluck('name');
-
-                                $allTags = $genres
-                                    ->merge($themes)
-                                    ->merge($demographics)
-                                    ->implode(', ');
-                            @endphp
-                            <input type="hidden" name="genres" value="{{ $allTags }}">
-                            <input type="hidden" name="target" value="personal">
-
-                            <button class="bg-purple-600 hover:bg-purple-700 text-white text-sm px-3 py-2 rounded w-full">
-                                👤 Adicionar ao meu espaço
-                            </button>
-                        </form>
+                        <x-anime-import-form :anime="$anime" target="personal" />
+                        <x-anime-import-form :anime="$anime" target="later" />
                     </div>
                 </div>
             @endforeach

@@ -7,9 +7,30 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (! $user->username) {
+                $base = substr(Str::slug($user->name, ''), 0, 20) ?: 'user';
+                $user->username = $base.'_'.strtolower(Str::random(8));
+            }
+        });
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function watchPlans()
+    {
+        return $this->hasMany(WatchPlan::class);
+    }
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
@@ -52,6 +73,12 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'is_public' => 'boolean',
+            'show_watching_public' => 'boolean',
+            'show_completed_public' => 'boolean',
+            'show_favorites_public' => 'boolean',
+            'show_top10_public' => 'boolean',
+            'show_reviews_public' => 'boolean',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
@@ -59,20 +86,20 @@ class User extends Authenticatable
 
     public function animeMeta()
     {
-        return $this->hasMany(\App\Models\UserAnimeMeta::class);
+        return $this->hasMany(UserAnimeMeta::class);
     }
 
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo
-            ? asset('public/storage/' . $this->profile_photo)
+            ? asset('storage/'.$this->profile_photo)
             : null;
     }
 
     public function getProfileBannerUrlAttribute()
     {
         return $this->profile_banner
-            ? asset('public/storage/' . $this->profile_banner)
+            ? asset('storage/'.$this->profile_banner)
             : null;
     }
 }

@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
@@ -37,22 +36,8 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // gera username base
-        $baseUsername = Str::slug($request->name, '');
-        $baseUsername = $baseUsername ?: 'user';
-
-        $username = $baseUsername;
-        $i = 1;
-
-        // garante que não repete
-        while (User::where('username', $username)->exists()) {
-            $username = $baseUsername . $i;
-            $i++;
-        }
-
         $user = User::create([
             'name' => $request->name,
-            'username' => strtolower($username),
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);

@@ -38,17 +38,12 @@
                 @php
                     $isWatching = in_array($anime->id, $myWatchingAnimeIds ?? []);
                     $isCompleted = in_array($anime->id, $myCompletedAnimeIds ?? []);
-                    $alreadyInList = $isWatching || $isCompleted;
+                    $myStatus = $myPlanStatuses[$anime->id] ?? null;
+                    $isPlanned = $myStatus === 'pretendo_assistir';
+                    $alreadyInList = $myStatus !== null;
 
-                    $reviewsWithRating = $anime->userMeta->whereNotNull('rating');
-                    $averageRating = $reviewsWithRating->count()
-                        ? number_format($reviewsWithRating->avg('rating'), 1)
-                        : null;
-
-                    $latestReview = $anime->userMeta
-                        ->filter(fn ($meta) => $meta->rating || $meta->comment)
-                        ->sortByDesc('updated_at')
-                        ->first();
+                    $averageRating = $anime->public_rating !== null ? number_format($anime->public_rating, 1) : null;
+                    $latestReview = $anime->latestPublicReview;
                 @endphp
 
                 <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
@@ -63,13 +58,15 @@
                                     {{ $anime->title }}
                                 </h2>
 
-                                @if($isCompleted)
+                                @if($isPlanned)
+                                    <span class="shrink-0 px-3 py-1 rounded-md text-xs font-semibold bg-amber-600 text-white">Pretendo assistir</span>
+                                @elseif($isCompleted)
                                     <span class="shrink-0 inline-flex items-center justify-center min-w-[92px] px-3 py-1 rounded-md text-xs font-semibold bg-green-600 text-white text-center">
                                         Concluído
                                     </span>
                                 @elseif($isWatching)
                                     <span class="shrink-0 inline-flex items-center justify-center min-w-[92px] px-3 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white text-center">
-                                        Assistindo
+                                        {{ $myStatus === 'pausado' ? 'Pausado' : 'Assistindo' }}
                                     </span>
                                 @else
                                     <span class="shrink-0 inline-flex items-center justify-center min-w-[92px] px-3 py-1 rounded-md text-xs font-semibold bg-gray-600 text-white text-center">
@@ -95,6 +92,7 @@
 
                             <div class="mt-4 flex flex-wrap gap-2">
                                 @auth
+                                    <x-watch-later-button :anime="$anime" :status="$myStatus" />
                                     @if(!$alreadyInList)
                                         <form method="POST" action="{{ route('completed.mark-watched', $anime->id) }}">
                                             @csrf
@@ -104,24 +102,13 @@
                                             </button>
                                         </form>
 
-                                        <form method="POST" action="{{ route('anime.store') }}">
-                                            @csrf
-                                            <input type="hidden" name="mal_id" value="{{ $anime->mal_id ?? '' }}">
-                                            <input type="hidden" name="title" value="{{ $anime->title }}">
-                                            <input type="hidden" name="episodes" value="{{ $anime->episodes }}">
-                                            <input type="hidden" name="synopsis" value="{{ $anime->synopsis }}">
-                                            <input type="hidden" name="status" value="{{ $anime->anime_status }}">
-                                            <input type="hidden" name="image" value="{{ $anime->image }}">
-                                            <input type="hidden" name="target" value="personal">
-
-                                            <button type="submit"
-                                                    class="inline-block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">
-                                                Acompanhar
-                                            </button>
-                                        </form>
+                                        <a href="{{ route('personal.watch-plans.create', $anime) }}" class="inline-block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Acompanhar</a>
                                     @else
+                                        @if($isPlanned)
+                                            <a href="{{ route('personal.watch-plans.create', $anime) }}" class="inline-block bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded text-white text-sm">Começar a assistir</a>
+                                        @endif
                                         @if($isCompleted)
-                                            <a href="{{ route('completed.review.create', $anime->id) }}"
+                                            <a href="{{ route('personal.completed.review.create', $anime->id) }}"
                                                class="inline-block bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-white text-sm">
                                                 Fazer review
                                             </a>

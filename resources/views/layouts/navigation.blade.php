@@ -58,7 +58,7 @@
                         <div x-show="open" @click.outside="open = false" x-transition
                             class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
                             
-                            <a href="{{ route('profile.show', Auth::user()->username) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <a href="{{ (Auth::user()->username ? route('profile.show', Auth::user()->username) : route('profile.edit')) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
                                  👤 Perfil
                             </a>
                             <a href="{{ route('personal.calendar') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -70,6 +70,7 @@
                             <a href="{{ route('personal.completed') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 ⭐ Meus concluídos
                             </a>
+                            <a href="{{ route('personal.watch-later.index') }}" class="block px-4 py-2 text-sm text-amber-700 dark:text-amber-200 hover:bg-gray-100 dark:hover:bg-gray-700">Pretendo assistir</a>
                             <a href="{{ route('personal.animes.index') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 🎛 Gerenciar meus animes
                             </a>
@@ -155,10 +156,11 @@
                     <span x-text="openPersonal ? '−' : '+'"></span>
                 </button>
                 <div x-show="openPersonal" class="ps-4">
-                    <x-responsive-nav-link :href="route('profile.show', Auth::user()->username)">👤 Perfil</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="(Auth::user()->username ? route('profile.show', Auth::user()->username) : route('profile.edit'))">👤 Perfil</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('personal.calendar')">📅 Meu calendário</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('personal.history')">📘 Meu histórico</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('personal.completed')">⭐ Meus concluídos</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('personal.watch-later.index')" :active="request()->routeIs('personal.watch-later.*')">Pretendo assistir</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('personal.animes.index')">🎛 Gerenciar</x-responsive-nav-link>
                 </div>
             </div>

@@ -34,4 +34,5 @@
         </div>
 
     </div>
+    <div class="max-w-6xl mx-auto px-6 pb-6">{{ $users->links() }}</div>
 </x-app-layout>

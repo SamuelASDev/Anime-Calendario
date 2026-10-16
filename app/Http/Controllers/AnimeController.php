@@ -2,124 +2,86 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\JikanService;
-use Illuminate\Http\Request;
+use App\Http\Requests\ImportAnimeRequest;
 use App\Models\Anime;
-use App\Services\TranslationService;
+use App\Models\WatchPlan;
+use App\Queries\AnimeCatalogQuery;
+use App\Services\JikanService;
+use App\Services\Planning\PlanManager;
+use Illuminate\Http\Request;
 
 class AnimeController extends Controller
 {
     public function search(Request $request, JikanService $jikan)
     {
+        $data = $request->validate(['q' => ['nullable', 'string', 'max:200']]);
         $results = [];
-
-        if ($request->q) {
-            $data = $jikan->search($request->q);
-            $results = $data['data'];
+        $searchError = null;
+        if (! empty($data['q'])) {
+            try {
+                $results = $jikan->search($data['q']);
+            } catch (\RuntimeException $exception) {
+                $searchError = 'A busca está indisponível no momento. Tente novamente em instantes.';
+            }
         }
 
-        return view('anime.search', compact('results'));
+        return view('anime.search', compact('results', 'searchError'));
     }
 
-    public function store(Request $request)
+    public function store(ImportAnimeRequest $request, PlanManager $manager)
     {
-        $request->validate([
-            'mal_id' => ['required'],
-            'title' => ['required', 'string'],
-            'episodes' => ['nullable'],
-            'synopsis' => ['nullable'],
-            'status' => ['nullable'],
-            'image' => ['nullable'],
-            'genres' => ['nullable', 'string'],
-            'target' => ['required', 'in:global,personal'],
+        $data = $request->validated();
+        $anime = Anime::firstOrCreate(['mal_id' => $data['mal_id']], [
+            'title' => $data['title'], 'episodes' => $data['episodes'] ?? null,
+            'synopsis' => $data['synopsis'] ?? null, 'anime_status' => $data['status'] ?? null,
+            'image' => $data['image'] ?? null, 'genres' => $data['genres'] ?? null,
         ]);
+        if ($data['target'] === 'later') {
+            $plan = $manager->saveForLater($anime, $request->user());
+            if ($plan->watch_status !== 'pretendo_assistir') {
+                return redirect()->route('personal.animes.index')->with('success', 'Este anime já faz parte da sua biblioteca. Seu status foi mantido.');
+            }
 
-        $anime = Anime::firstOrCreate(
-            ['mal_id' => $request->mal_id],
-            [
-                'title' => $request->title,
-                'episodes' => $request->episodes ?: null,
-                'synopsis' => $request->synopsis,
-                'anime_status' => $request->status,
-                'image' => $request->image,
-                'genres' => $request->genres,
-            ]
-        );
-
-        if ($request->target === 'global') {
-            abort_unless(auth()->user()?->role === 'admin', 403);
-
-            return redirect()->route('watch-plans.create', $anime->id);
+            return redirect()->route('personal.watch-later.index')->with('success', 'Anime disponível na sua biblioteca para assistir depois.');
         }
 
-        return redirect()->route('personal.watch-plans.create', $anime->id);
+        return redirect()->route($data['target'] === 'global' ? 'watch-plans.create' : 'personal.watch-plans.create', $anime);
     }
 
     public function show(Anime $anime)
     {
-        $anime->load([
-            'userMeta' => function ($query) {
-                $query->with('user')->latest();
-            }
-        ]);
+        $reviews = $anime->userMeta()->publiclyVisible()->with('user')
+            ->where(fn ($q) => $q->whereNotNull('rating')->orWhereNotNull('comment'))->latest()->paginate(12);
 
-        return view('anime.show', compact('anime'));
+        $myPlanStatus = WatchPlan::ownedBy(auth()->id())->where('anime_id', $anime->id)->value('watch_status');
+
+        return view('anime.show', compact('anime', 'reviews', 'myPlanStatus'));
     }
 
     public function editSynopsis(Anime $anime)
     {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
         return view('anime.edit-synopsis', compact('anime'));
     }
 
     public function updateSynopsis(Request $request, Anime $anime)
     {
-        $request->validate([
-            'synopsis' => ['nullable', 'string', 'max:5000'],
-        ]);
+        abort_unless($request->user()->isAdmin(), 403);
+        $anime->update($request->validate(['synopsis' => ['nullable', 'string', 'max:20000']]));
 
-        $anime->update([
-            'synopsis' => $request->synopsis,
-        ]);
-
-        return redirect()
-            ->route('anime.show', $anime->id)
-            ->with('success', 'Sinopse atualizada com sucesso.');
+        return redirect()->route('anime.show', $anime)->with('success', 'Sinopse atualizada.');
     }
 
-    public function allAnimeIndex()
+    public function allAnimeIndex(Request $request, AnimeCatalogQuery $catalog)
     {
-        $user = auth()->user();
+        $data = $request->validate(['q' => ['nullable', 'string', 'max:200']]);
+        $animes = $catalog->paginate($data['q'] ?? null);
+        $statuses = WatchPlan::ownedBy($request->user()->id)->pluck('watch_status', 'anime_id');
+        $myPlanStatuses = $statuses->all();
+        $myWatchingAnimeIds = $statuses->filter(fn ($status) => in_array($status, ['assistindo', 'pausado']))->keys()->all();
+        $myCompletedAnimeIds = $statuses->filter(fn ($status) => $status === 'concluido')->keys()->all();
 
-        $query = \App\Models\Anime::with([
-            'userMeta.user',
-        ]);
-
-        if (request('q')) {
-            $query->where('title', 'like', '%' . request('q') . '%');
-        }
-
-        $animes = $query->latest()->paginate(24)->withQueryString();
-
-        $myWatchingAnimeIds = [];
-        $myCompletedAnimeIds = [];
-
-        if ($user) {
-            $myWatchingAnimeIds = \App\Models\WatchPlan::where('user_id', $user->id)
-                ->where('watch_status', 'assistindo')
-                ->pluck('anime_id')
-                ->toArray();
-
-            $myCompletedAnimeIds = \App\Models\WatchPlan::where('user_id', $user->id)
-                ->where('watch_status', 'concluido')
-                ->pluck('anime_id')
-                ->toArray();
-        }
-
-        return view('anime.index-all', compact(
-            'animes',
-            'myWatchingAnimeIds',
-            'myCompletedAnimeIds'
-        ));
+        return view('anime.index-all', compact('animes', 'myWatchingAnimeIds', 'myCompletedAnimeIds', 'myPlanStatuses'));
     }
-
 }

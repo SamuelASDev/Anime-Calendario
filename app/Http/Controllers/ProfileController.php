@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\UpdatePublicProfileRequest;
+use App\Models\User;
+use App\Queries\ProfileQuery;
+use App\Services\Profiles\ProfileManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -51,7 +54,7 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        app(ProfileManager::class)->delete($user);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -59,111 +62,23 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function updatePublicProfile(Request $request)
+    public function updatePublicProfile(UpdatePublicProfileRequest $request, ProfileManager $profiles)
     {
-        $user = $request->user();
-
-        $data = $request->validate([
-            'username' => ['required', 'string', 'max:30', 'alpha_dash', 'unique:users,username,' . $user->id],
-            'bio' => ['nullable', 'string', 'max:1000'],
-            'is_public' => ['nullable', 'boolean'],
-            'show_watching_public' => ['nullable', 'boolean'],
-            'show_completed_public' => ['nullable', 'boolean'],
-            'show_favorites_public' => ['nullable', 'boolean'],
-            'show_top10_public' => ['nullable', 'boolean'],
-            'show_reviews_public' => ['nullable', 'boolean'],
-            'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'profile_banner' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-        ]);
-
-        if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
-                Storage::disk('public')->delete($user->profile_photo);
-            }
-
-            $data['profile_photo'] = $request->file('profile_photo')->store('profiles/photos', 'public');
+        $data = $request->validated();
+        foreach (['is_public', 'show_watching_public', 'show_completed_public', 'show_favorites_public', 'show_top10_public', 'show_reviews_public'] as $flag) {
+            $data[$flag] = $request->boolean($flag);
         }
+        $profiles->update($request->user(), $data);
 
-        if ($request->hasFile('profile_banner')) {
-            if ($user->profile_banner && Storage::disk('public')->exists($user->profile_banner)) {
-                Storage::disk('public')->delete($user->profile_banner);
-            }
-
-            $data['profile_banner'] = $request->file('profile_banner')->store('profiles/banners', 'public');
-        }
-
-        $user->update([
-            'username' => $data['username'],
-            'bio' => $data['bio'] ?? null,
-            'is_public' => $request->boolean('is_public'),
-            'show_watching_public' => $request->boolean('show_watching_public'),
-            'show_completed_public' => $request->boolean('show_completed_public'),
-            'show_favorites_public' => $request->boolean('show_favorites_public'),
-            'show_top10_public' => $request->boolean('show_top10_public'),
-            'show_reviews_public' => $request->boolean('show_reviews_public'),
-            'profile_photo' => $data['profile_photo'] ?? $user->profile_photo,
-            'profile_banner' => $data['profile_banner'] ?? $user->profile_banner,
-        ]);
-
-        return redirect()->route('profile.edit')->with('success', 'Perfil público atualizado com sucesso.');
+        return redirect()->route('profile.edit')->with('success', 'Perfil atualizado com sucesso.');
     }
 
-    public function show($username)
+    public function show(string $username, ProfileQuery $profiles)
     {
-        $user = \App\Models\User::where('username', $username)->firstOrFail();
+        $user = User::where('username', $username)->firstOrFail();
+        $owner = auth()->id() === $user->id;
+        abort_unless($user->is_public || $owner, 403);
 
-        if (!$user->is_public) {
-            abort(403);
-        }
-
-        $watching = collect();
-        $completed = collect();
-        $favorites = collect();
-        $top10 = collect();
-        $reviews = collect();
-
-        if ($user->show_watching_public) {
-            $watching = \App\Models\WatchPlan::with('anime')
-                ->where('user_id', $user->id)
-                ->where('watch_status', 'assistindo')
-                ->get();
-        }
-
-        if ($user->show_completed_public) {
-            $completed = \App\Models\WatchPlan::with('anime')
-                ->where('user_id', $user->id)
-                ->where('watch_status', 'concluido')
-                ->get();
-        }
-
-        if ($user->show_favorites_public) {
-            $favorites = \App\Models\UserAnimeMeta::with('anime')
-                ->where('user_id', $user->id)
-                ->where('is_favorite', true)
-                ->get();
-        }
-
-        if ($user->show_top10_public) {
-            $top10 = \App\Models\UserAnimeMeta::with('anime')
-                ->where('user_id', $user->id)
-                ->whereNotNull('top_position')
-                ->orderBy('top_position')
-                ->get();
-        }
-
-        if ($user->show_reviews_public) {
-            $reviews = \App\Models\UserAnimeMeta::with('anime')
-                ->where('user_id', $user->id)
-                ->where(function ($q) {
-                    $q->whereNotNull('rating')
-                    ->orWhereNotNull('comment');
-                })
-                ->get();
-        }
-
-        return view('profile.show', compact('user', 'watching', 'completed', 'favorites', 'top10', 'reviews'));
+        return view('profile.show', $profiles->sections($user, $owner));
     }
-
-
-
 }

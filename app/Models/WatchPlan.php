@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use App\Services\Planning\PlanProjection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class WatchPlan extends Model
 {
@@ -36,47 +37,28 @@ class WatchPlan extends Model
         return $this->hasMany(WatchLog::class);
     }
 
-        public function getCurrentEpisodeCalculatedAttribute(): int
+    protected function casts(): array
     {
-        $this->loadMissing('anime', 'days', 'logs');
+        return ['episodes_watched' => 'integer', 'episodes_per_day' => 'integer', 'completed_at' => 'datetime'];
+    }
 
-        if (!$this->start_date) {
-            return (int) $this->episodes_watched;
-        }
+    public function scopeGlobal(Builder $query): Builder
+    {
+        return $query->whereNull('user_id');
+    }
 
-        $startDate = Carbon::parse($this->start_date)->startOfDay();
-        $today = Carbon::today();
+    public function scopeOwnedBy(Builder $query, int $userId): Builder
+    {
+        return $query->where('user_id', $userId);
+    }
 
-        $daysMap = $this->days->keyBy('day_of_week');
-        $logsMap = $this->logs->keyBy(function ($log) {
-            return Carbon::parse($log->watched_date)->format('Y-m-d');
-        });
+    public function pauses()
+    {
+        return $this->hasMany(WatchPlanPause::class);
+    }
 
-        $currentEpisode = (int) $this->episodes_watched;
-        $date = $startDate->copy();
-
-        while ($date->lt($today)) {
-            $dateKey = $date->format('Y-m-d');
-            $dayOfWeek = $date->dayOfWeek;
-
-            $dayConfig = $daysMap[$dayOfWeek] ?? null;
-            $log = $logsMap[$dateKey] ?? null;
-
-            if ($log) {
-                $currentEpisode += (int) $log->episodes_watched_today;
-            } elseif ($dayConfig) {
-                if (!$dayConfig->is_variable && (int) $dayConfig->episodes_planned > 0) {
-                    $currentEpisode += (int) $dayConfig->episodes_planned;
-                }
-            }
-
-            if (!empty($this->anime?->episodes) && $currentEpisode >= $this->anime->episodes) {
-                return (int) $this->anime->episodes;
-            }
-
-            $date->addDay();
-        }
-
-        return $currentEpisode;
+    public function getCurrentEpisodeCalculatedAttribute(): int
+    {
+        return app(PlanProjection::class)->currentEpisode($this);
     }
 }

@@ -57,7 +57,7 @@
                                 📅 Meu calendário
                             </a>
 
-                            <a href="{{ route('profile.show', auth()->user()->username) }}"
+                            <a href="{{ (auth()->user()->username ? route('profile.show', auth()->user()->username) : route('profile.edit')) }}"
                                class="inline-flex items-center justify-center rounded-xl bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 text-sm font-medium transition text-center">
                                 👤 Meu perfil
                             </a>
@@ -67,6 +67,11 @@
             </div>
 
             {{-- COMO FUNCIONA --}}
+            <a href="{{ route('personal.watch-later.index') }}" class="block rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-200 hover:bg-amber-500/20">
+                <span class="font-semibold">Pretendo assistir</span>
+                <span class="block mt-1 text-sm">Guarde suas próximas escolhas e comece quando quiser.</span>
+            </a>
+
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
                 <h3 class="text-lg sm:text-xl text-gray-900 dark:text-white font-semibold mb-4">
                     🧭 Como funciona o sistema

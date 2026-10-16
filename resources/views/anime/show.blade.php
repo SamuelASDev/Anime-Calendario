@@ -14,6 +14,15 @@
             </div>
         @endif
 
+        <div class="mb-5 flex flex-wrap items-center gap-3">
+            <x-watch-later-button :anime="$anime" :status="$myPlanStatus" />
+            @if($myPlanStatus === null || $myPlanStatus === 'pretendo_assistir')
+                <a href="{{ route('personal.watch-plans.create', $anime) }}" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm">Começar a assistir</a>
+            @else
+                <a href="{{ route('personal.animes.index') }}" class="text-sm text-indigo-300">Ver na minha biblioteca</a>
+            @endif
+        </div>
+
         <div class="bg-gray-800 rounded-lg p-4 sm:p-6 shadow-md border border-gray-700">
 
             <div class="flex flex-col md:flex-row gap-6">
@@ -30,10 +39,12 @@
                         </h1>
 
                         @auth
-                            <a href="{{ route('anime.synopsis.edit', $anime->id) }}"
+                            @if(auth()->user()->isAdmin())
+<a href="{{ route('anime.synopsis.edit', $anime->id) }}"
                                class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition">
                                 Editar sinopse
                             </a>
+@endif
                         @endauth
                     </div>
 
@@ -79,12 +90,6 @@
                 <h2 class="text-xl font-bold mb-4 text-blue-300">
                     Reviews
                 </h2>
-
-                @php
-                    $reviews = $anime->userMeta
-                        ->filter(fn ($meta) => $meta->rating || $meta->comment)
-                        ->sortByDesc('updated_at');
-                @endphp
 
                 @if($reviews->count())
                     <div class="space-y-4">
@@ -132,6 +137,7 @@
                             </div>
                         @endforeach
                     </div>
+                    <div class="mt-5">{{ $reviews->links() }}</div>
                 @else
                     <div class="bg-gray-900 border border-gray-700 rounded p-4 text-gray-300">
                         Nenhuma review ainda.
