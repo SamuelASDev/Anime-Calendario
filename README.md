@@ -73,6 +73,8 @@ composer check executa Laravel Pint e Pest/PHPUnit. phpunit.xml usa SQLite em me
 
 Os testes de navegador usam Playwright/Chromium e um servidor exclusivo na porta 8011 (ou `E2E_PORT`), com SQLite temporário em `storage/framework/testing`, chave de aplicação própria e fixtures dedicadas. Eles não reutilizam o servidor ou o MySQL de desenvolvimento. Relatórios e traces ficam em `playwright-report`/`test-results`, ignorados pelo Git. A CI também executa esses testes e publica artefatos em caso de falha.
 
+A CI também testa atualização de esquema legado com dados em MariaDB 10.11 e MySQL 8.0. `php scripts/check-legacy-upgrade.php` exige servidor local e permissão para criar um schema descartável; não migra o banco da aplicação. Se uma implantação falhou com erro 1901 ao criar `owner_key`, atualize para a versão corrigida e repita `php artisan migrate --force`: a FK legada deve passar de SET NULL para CASCADE antes da coluna gerada. Não é necessário resetar o banco ou executar rollback para essa falha.
+
 O benchmark cria um banco SQLite em memória no próprio processo e mede movimentos em coleções de 100, 1.000 e 10.000 itens. Ver `PERFORMANCE.md` para resultados e limites da medição; não é teste de carga de produção.
 
 ### Busca externa de animes
