@@ -10,7 +10,7 @@
                 </div>
                 <div class="horizontal-grid">
                     @forelse($planned as $plan)
-                    <x-plan-card :plan="$plan" route-prefix="personal.animes" />@empty<div class="col-span-full">
+                    <x-plan-card :plan="$plan" route-prefix="personal.animes" :async="true" />@empty<div class="col-span-full">
                             <x-empty-state title="Sua próxima história está lá fora"
                                 description="Guarde animes com Pretendo assistir para encontrá-los aqui."
                                 icon="bookmark" /></div>

@@ -35,9 +35,10 @@
 .search-field input { width:100%; min-height:44px; padding:10px 14px 10px 41px; }
 .filter-sort select { min-height:44px; min-width:210px; }
 .filter-secondary { display:flex; flex-wrap:wrap; gap:12px; align-items:end; padding-top:14px; margin-top:14px; border-top:1px solid var(--line); }
-.filter-secondary label:not(.filter-check) { flex:1; min-width:125px; max-width:225px; }
+.filter-secondary label:not(.filter-check) { flex:1; min-width:165px; max-width:225px; }
 .filter-secondary label>span { display:block; text-transform:uppercase; color:#7e899e; font-size:.6rem; letter-spacing:.12em; font-weight:700; margin-bottom:6px; }
 .filter-secondary select { width:100%; padding:8px 30px 8px 11px; font-size:.76rem; }
+.filter-secondary input[type=date] { width:100%; padding:8px 11px; font-size:.76rem; }
 .filter-check { display:flex; gap:7px; align-items:center; min-height:37px; color:#b6c0d2; font-size:.75rem; white-space:nowrap; }
 .filter-check .icon { width:15px; color:#e8bd66; }
 .filter-clear { display:flex; gap:4px; align-items:center; padding:10px 0; margin-left:auto; font-size:.73rem; color:#a994e2; }

@@ -1,4 +1,4 @@
-@props(['plan', 'routePrefix', 'editable' => true])
+@props(['plan', 'routePrefix', 'editable' => true, 'viewerStatus' => null, 'async' => false])
 @php($episode = $plan->current_episode_calculated)
 <article class="anime-card plan-card" data-anime-card>
     <div class="plan-cover">
@@ -53,13 +53,18 @@
                             aria-label="Concluir {{ $plan->anime->title }}" title="Concluir"><x-icon
                                 name="check" /></button></form>
                 @endif
-                <form method="POST" action="{{ route($routePrefix . '.destroy', $plan) }}"
+                <form @if ($async) data-collection-action @endif method="POST" action="{{ route($routePrefix . '.destroy', $plan) }}"
                     onsubmit="return confirm('Remover este planejamento?')">@csrf @method('DELETE')<button
                         class="btn btn-danger btn-sm" aria-label="Remover {{ $plan->anime->title }}"
                         title="Remover"><x-icon name="trash" /></button></form>
             @else
-                <form method="POST" action="{{ route('personal.watch-plans.follow', $plan) }}">@csrf<button
-                        class="btn btn-secondary btn-sm"><x-icon name="plus" />Acompanhar</button></form>
+                @if (in_array($viewerStatus, ['assistindo', 'pausado', 'concluido'], true))
+                    <a class="btn btn-secondary btn-sm" href="{{ route('personal.animes.index', ['q' => $plan->anime->title]) }}">Na minha lista <x-icon name="arrow" /></a>
+                @else
+                    <form method="POST" action="{{ route('personal.watch-plans.follow', $plan) }}">@csrf<button
+                            class="btn btn-primary btn-sm" title="Cria seu plano pessoal com a mesma agenda e no mesmo episódio da comunidade"
+                            aria-label="Acompanhar {{ $plan->anime->title }} a partir do episódio {{ $episode }}"><x-icon name="plus" />Acompanhar</button></form>
+                @endif
                 <x-watch-later-button :anime="$plan->anime" />
             @endif
         </div>

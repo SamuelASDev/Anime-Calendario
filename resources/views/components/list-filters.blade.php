@@ -3,7 +3,7 @@
     <div class="filter-primary">
         <div class="search-field"><x-icon name="search" /><label class="sr-only" for="list-search">Buscar pelo
                 título</label><input id="list-search" type="search" name="q" value="{{ request('q') }}"
-                placeholder="Encontre um anime pelo título…" maxlength="200"></div>
+                placeholder="Encontre um anime pelo título ou nome alternativo…" maxlength="200"></div>
         @if ($scope !== 'profile')
             <label class="filter-sort"><span class="sr-only">Ordenar por</span><select name="sort"
                     aria-label="Ordenar por">
@@ -27,6 +27,29 @@
                 @endforeach
             </select>
         </label>
+        <label><span>Estúdio</span><select name="studio">
+                <option value="">Todos os estúdios</option>
+                @foreach ($studios as $studio)
+                    <option value="{{ $studio }}" @selected(request('studio') === $studio)>{{ $studio }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label><span>Origem</span><select name="source">
+                <option value="">Todas as origens</option>
+                @foreach ($sourceMaterials as $value => $label)
+                    <option value="{{ $value }}" @selected(request('source') === (string) $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label><span>Temporada</span><select name="season">
+                <option value="">Todas as temporadas</option>
+                @foreach ($seasons as $value => $label)
+                    <option value="{{ $value }}" @selected(request('season') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label><span>Lançado a partir de</span><input type="date" name="aired_from" value="{{ request('aired_from') }}"></label>
+        <label><span>Lançado até</span><input type="date" name="aired_until" value="{{ request('aired_until') }}"></label>
         @if ($statuses)
             <label><span>Minha lista</span><select name="status">
                     <option value="">Todos os status</option>
@@ -60,7 +83,7 @@
             <label class="filter-check"><input type="checkbox" name="favorite" value="1"
                     @checked(request()->boolean('favorite'))><x-icon name="star" /> Só meus favoritos</label>
         @endif
-        @if (request()->hasAny(['q', 'genre', 'status', 'sort', 'favorite', 'airing', 'length']))
+        @if (request()->hasAny(['q', 'genre', 'status', 'sort', 'favorite', 'airing', 'length', 'aired_from', 'aired_until', 'studio', 'source', 'season']))
             <a class="filter-clear" href="{{ url()->current() }}"><x-icon name="close" /> Limpar filtros</a>
         @endif
     </div>

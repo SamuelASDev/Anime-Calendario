@@ -38,7 +38,7 @@ class LibraryController extends Controller
         $plan = $manager->saveForLater($anime, $request->user());
         $message = $plan->watch_status === 'pretendo_assistir' ? 'Anime guardado em Pretendo assistir.' : 'Este anime já faz parte da sua biblioteca. Seu status foi mantido.';
 
-        return back()->with('success', $message);
+        return $this->mutationResponse($message, ['stats', 'planned', 'top10', 'favorites', 'watching', 'completed', 'reviews']);
     }
 
     public function markAsWatched(Anime $anime, PlanManager $manager)

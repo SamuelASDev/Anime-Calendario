@@ -6,6 +6,7 @@ use App\Enums\WatchStatus;
 use App\Models\Anime;
 use App\Models\User;
 use App\Models\WatchPlan;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -130,23 +131,30 @@ class PlanManager
         return DB::transaction(function () use ($source, $user) {
             Anime::whereKey($source->anime_id)->lockForUpdate()->firstOrFail();
             $existing = WatchPlan::ownedBy($user->id)->where('anime_id', $source->anime_id)->first();
-            if ($existing) {
+            // A watch-later entry has no progress to lose, so it becomes the copy; anything else is kept untouched.
+            if ($existing && ($existing->id === $source->id || $existing->watch_status !== WatchStatus::Planned->value)) {
                 return $existing;
             }
             $source->loadMissing('anime', 'days', 'logs', 'pauses');
             $current = $this->projection->currentEpisode($source);
             $completed = $source->anime->episodes && $current >= $source->anime->episodes;
-            $copy = WatchPlan::create([
-                'user_id' => $user->id, 'anime_id' => $source->anime_id,
-                'episodes_watched' => $current, 'episodes_per_day' => $source->episodes_per_day,
-                'start_date' => max(today()->toDateString(), substr((string) $source->start_date, 0, 10)),
+            $today = today()->toDateString();
+            $todayLog = $completed ? null : $source->logs->first(fn ($log) => substr((string) $log->watched_date, 0, 10) === $today);
+            $copy = $existing ?? new WatchPlan(['user_id' => $user->id, 'anime_id' => $source->anime_id]);
+            $copy->fill([
+                // Today's log is copied below instead of baked in here: the copy would otherwise also
+                // advance by today's schedule tomorrow and run ahead of its source.
+                'episodes_watched' => $todayLog ? $this->projection->beforeDay($source, CarbonImmutable::instance(today())) : $current,
+                'episodes_per_day' => $source->episodes_per_day,
+                'start_date' => max($today, substr((string) $source->start_date, 0, 10)),
                 'watch_status' => $completed ? 'concluido' : 'assistindo',
             ]);
-            if ($completed) {
-                $copy->forceFill(['completed_at' => now()])->save();
-            }
+            $copy->forceFill(['completed_at' => $completed ? now() : null])->save();
             foreach ($source->days as $day) {
-                $copy->days()->create($day->only('day_of_week', 'episodes_planned', 'is_variable'));
+                $copy->days()->updateOrCreate(['day_of_week' => $day->day_of_week], $day->only('episodes_planned', 'is_variable'));
+            }
+            if ($todayLog) {
+                $copy->logs()->create(['watched_date' => $today, 'episodes_watched_today' => $todayLog->episodes_watched_today]);
             }
 
             return $copy;

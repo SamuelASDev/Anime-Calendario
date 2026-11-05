@@ -1,9 +1,19 @@
 <?php
 
+use App\Http\Controllers\Admin\AnimeMetadataController;
 use App\Http\Controllers\Admin\WatchPlanAdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::get('/admin/catalogo/dados', [AnimeMetadataController::class, 'index'])
+        ->name('admin.animes.metadata');
+
+    Route::post('/admin/catalogo/dados/sincronizar', [AnimeMetadataController::class, 'sync'])
+        ->middleware('throttle:60,1')->name('admin.animes.metadata.sync');
+
+    Route::post('/admin/catalogo/dados/repetir-falhas', [AnimeMetadataController::class, 'retryFailed'])
+        ->name('admin.animes.metadata.retry');
 
     Route::get('/admin/animes', [WatchPlanAdminController::class, 'index'])
         ->name('admin.animes.index');

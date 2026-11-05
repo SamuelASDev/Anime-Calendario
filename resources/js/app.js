@@ -7,3 +7,4 @@ window.Alpine = Alpine;
 Alpine.start();
 
 import './collections/profile';
+import './admin/metadata-sync';

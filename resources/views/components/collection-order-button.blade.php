@@ -12,7 +12,7 @@
         : route('personal.animes.collection-order', $anime);
 @endphp
 
-<form data-collection-action method="POST" action="{{ $url }}">
+<form data-collection-action data-repeatable method="POST" action="{{ $url }}">
     @csrf
     @method('PATCH')
     @if ($collection !== 'top10')

@@ -90,6 +90,11 @@ test('catalog renders a different provider through the internal DTO without Tenr
         {
             return [new CatalogAnime(222, 'Outro catálogo', 'https://example.test/poster.jpg', 12, 'Sinopse', 'Finalizado', ['Drama'])];
         }
+
+        public function find(int $malId): ?CatalogAnime
+        {
+            return null;
+        }
     });
     $this->actingAs(User::factory()->create())->get(route('anime.search', ['q' => 'outro']))
         ->assertOk()->assertSee('Outro catálogo')->assertSee('https://example.test/poster.jpg', false)->assertSee('name="mal_id" value="222"', false);

@@ -4,6 +4,8 @@ return [
 
     'anime_catalog' => [
         'base_url' => env('ANIME_CATALOG_BASE_URL', 'https://api.tenrai.org/v1'),
+        // Seconds between background reads: 2 means 30/min, half of the lowest published public limit (60/min).
+        'sync_interval' => (int) env('ANIME_CATALOG_SYNC_INTERVAL', 2),
     ],
 
     /*

@@ -90,6 +90,57 @@ test('completed order changes only completed and persists', async ({ page }) => 
     await expect(page.locator('#completed .card-title').first()).toHaveText('Anime 14');
 });
 
+test('a burst of rank clicks applies every move and refreshes without navigation', async ({ page }) => {
+    let navigations = 0;
+    page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) navigations++; });
+    const down = page.getByRole('button', { name: 'Descer Anime 01 no Top 10', exact: true });
+    await down.evaluate((button) => { button.click(); button.click(); });
+    await expect(page.locator('#top10 .card-title')).toHaveText(['Anime 02', 'Anime 03', 'Anime 01']);
+    expect(navigations).toBe(0);
+    await page.reload();
+    await expect(page.locator('#top10 .card-title')).toHaveText(['Anime 02', 'Anime 03', 'Anime 01']);
+});
+
+test('cancelling the removal confirmation keeps the planned anime', async ({ page }) => {
+    page.once('dialog', (dialog) => dialog.dismiss());
+    await page.getByRole('button', { name: 'Remover Anime em espera', exact: true }).click();
+    await expect(page.locator('#planned .card-title')).toHaveText(['Anime em espera']);
+    await expect(page.locator('[data-async-feedback]')).toBeEmpty();
+});
+
+test('removing a planned anime updates the section and the counter in place', async ({ page }) => {
+    let navigations = 0;
+    page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) navigations++; });
+    await expect(page.locator('#planned .card-title')).toHaveText(['Anime em espera']);
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.getByRole('button', { name: 'Remover Anime em espera', exact: true }).click();
+    await expect(page.locator('#planned .card-title')).toHaveCount(0);
+    await expect(page.locator('#planned')).toContainText('Sua próxima história está lá fora');
+    expect(navigations).toBe(0);
+});
+
+test('saving for later from another profile switches the button in place', async ({ page }) => {
+    await page.goto('/u/browser_other');
+    let navigations = 0;
+    page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) navigations++; });
+    await page.locator('#favorites').getByRole('button', { name: 'Pretendo assistir' }).click();
+    await expect(page.locator('#favorites').getByRole('link', { name: '✓ Pretendo assistir' })).toBeVisible();
+    expect(navigations).toBe(0);
+});
+
+test('going back to the profile shows changes made on another page', async ({ page }) => {
+    const planned = page.locator('#planned .card-title').filter({ hasText: 'Anime em espera' });
+    await expect(planned).toHaveCount(0);
+    await page.goto('/anime/15');
+    await page.getByRole('button', { name: 'Pretendo assistir' }).click();
+    await expect(page.getByRole('link', { name: '✓ Pretendo assistir' })).toBeVisible();
+    // Submitting the form adds its own history entry on top of the anime page.
+    await page.goBack();
+    await page.goBack();
+    await expect(page).toHaveURL(/\/u\/browser_test/);
+    await expect(planned).toHaveCount(1);
+});
+
 test('fragment failure after saving explains that the database was updated', async ({ page }) => {
     await page.route('**/u/browser_test?**', (route) => route.fulfill({ status: 503, body: '' }));
     await page.getByRole('button', { name: 'Descer Anime 01 em Favoritos', exact: true }).click();

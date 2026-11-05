@@ -12,4 +12,7 @@ interface AnimeCatalogProvider
 
     /** @return list<CatalogAnime> */
     public function search(string $query): array;
+
+    /** Returns null when the catalog does not know this ID; throws on any other failure. */
+    public function find(int $malId): ?CatalogAnime;
 }

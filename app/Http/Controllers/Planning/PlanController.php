@@ -124,6 +124,9 @@ abstract class PlanController extends Controller
     public function destroy(WatchPlan $plan)
     {
         $this->scoped($plan)->delete();
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'Plano removido. Avaliações e favoritos foram preservados.', 'blocks' => ['stats', 'planned']]);
+        }
 
         return redirect()->route($this->indexRoute())->with('success', 'Plano removido. Avaliações e favoritos foram preservados.');
     }
@@ -183,8 +186,16 @@ abstract class PlanController extends Controller
     public function followFromGlobal(WatchPlan $plan)
     {
         Gate::authorize('copy', $plan);
-        $this->manager->copy($plan, auth()->user());
+        $copy = $this->manager->copy($plan, auth()->user());
+        if (! $copy->wasRecentlyCreated && ! $copy->wasChanged('watch_status')) {
+            return redirect()->route('personal.animes.index')->with('success', 'Este anime já está na sua biblioteca. Seu progresso foi mantido.');
+        }
+        $copy = $copy->fresh();
+        $origin = $plan->user_id === null ? 'da comunidade' : 'desta agenda';
+        $title = $plan->anime->title;
 
-        return redirect()->route('personal.animes.index')->with('success', 'Plano disponível na sua biblioteca.');
+        return redirect()->route('personal.animes.index')->with('success', $copy->watch_status === 'concluido'
+            ? "{$title} já terminou no ritmo {$origin} e foi para os seus concluídos."
+            : "Agora você acompanha {$title} no mesmo ponto {$origin}: episódio {$copy->current_episode_calculated}.");
     }
 }

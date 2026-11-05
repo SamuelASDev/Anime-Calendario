@@ -15,7 +15,7 @@
         </section>
         <section>
             <div class="section-heading"><div><h2><x-icon name="users" />No ritmo da comunidade</h2><p>Histórias que estamos assistindo juntos.</p></div><a href="{{ route('calendar') }}">Calendário da comunidade <x-icon name="arrow" class="w-3 h-3" /></a></div>
-            <div class="horizontal-grid">@forelse($liveWatchingAnimes as $plan)<x-plan-card :plan="$plan" route-prefix="admin.animes" :editable="false" />@empty<div class="col-span-full"><x-empty-state title="Uma pausa entre histórias" description="Quando a comunidade começar um novo anime, ele aparece aqui." icon="users" /></div>@endforelse</div>
+            <div class="horizontal-grid">@forelse($liveWatchingAnimes as $plan)<x-plan-card :plan="$plan" route-prefix="admin.animes" :editable="false" :viewer-status="$myStatuses[$plan->anime_id] ?? null" />@empty<div class="col-span-full"><x-empty-state title="Uma pausa entre histórias" description="Quando a comunidade começar um novo anime, ele aparece aqui." icon="users" /></div>@endforelse</div>
         </section>
         <div class="surface mt-9 p-6 flex flex-wrap items-center justify-between gap-5"><div><p class="eyebrow">Para assistir depois</p><h2 class="text-lg font-semibold">Não deixe uma boa indicação se perder.</h2><p class="text-sm text-slate-400 mt-2">Guarde suas próximas escolhas em Pretendo assistir.</p></div><a class="btn btn-secondary" href="{{ route('personal.watch-later.index') }}"><x-icon name="bookmark" />Ver minha lista de espera</a></div>
     </div>

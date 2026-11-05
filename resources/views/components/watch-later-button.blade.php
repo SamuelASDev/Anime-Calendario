@@ -10,5 +10,5 @@
 @if($status === 'pretendo_assistir')
     <a href="{{ route('personal.watch-later.index') }}" class="btn btn-secondary btn-sm">✓ Pretendo assistir</a>
 @elseif($status === null)
-    <form method="POST" action="{{ route('personal.watch-later.store', $anime) }}">@csrf<button class="btn btn-secondary btn-sm"><x-icon name="bookmark" />Pretendo assistir</button></form>
+    <form data-collection-action method="POST" action="{{ route('personal.watch-later.store', $anime) }}">@csrf<button class="btn btn-secondary btn-sm"><x-icon name="bookmark" />Pretendo assistir</button></form>
 @endif

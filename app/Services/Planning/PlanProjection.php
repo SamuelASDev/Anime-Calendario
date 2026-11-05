@@ -123,7 +123,7 @@ class PlanProjection
         return $entries;
     }
 
-    private function beforeDay(WatchPlan $plan, CarbonImmutable $date): int
+    public function beforeDay(WatchPlan $plan, CarbonImmutable $date): int
     {
         // Avoid completed-state display shortcuts when reconstructing a historical prefix.
         $projection = clone $plan;

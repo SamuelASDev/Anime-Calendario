@@ -8,6 +8,7 @@ use App\Models\Anime;
 use App\Models\WatchPlan;
 use App\Queries\AnimeCatalogQuery;
 use App\Services\AnimeSearchService;
+use App\Services\Catalog\AnimeMetadataSync;
 use App\Services\Planning\PlanManager;
 use Illuminate\Http\Request;
 
@@ -31,7 +32,7 @@ class AnimeController extends Controller
         return view('anime.search', ['catalogSource' => $catalogSearch->sourceName()] + compact('results', 'searchError', 'localAnimes'));
     }
 
-    public function store(ImportAnimeRequest $request, PlanManager $manager)
+    public function store(ImportAnimeRequest $request, PlanManager $manager, AnimeSearchService $catalogSearch, AnimeMetadataSync $metadata)
     {
         $data = $request->validated();
         $anime = Anime::firstOrCreate(['mal_id' => $data['mal_id']], [
@@ -39,6 +40,16 @@ class AnimeController extends Controller
             'synopsis' => $data['synopsis'] ?? null, 'anime_status' => $data['status'] ?? null,
             'image' => $data['image'] ?? null, 'genres' => $data['genres'] ?? null,
         ]);
+        if ($anime->wasRecentlyCreated) {
+            // Never lets extra metadata block an import: on any problem the anime just stays in the admin queue.
+            try {
+                if ($result = $catalogSearch->recentResult($anime->mal_id)) {
+                    $metadata->apply($anime, $result);
+                }
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
         if ($data['target'] === 'later') {
             $plan = $manager->saveForLater($anime, $request->user());
             if ($plan->watch_status !== 'pretendo_assistir') {
@@ -53,6 +64,7 @@ class AnimeController extends Controller
 
     public function show(Anime $anime)
     {
+        $anime->load('titles');
         $reviews = $anime->userMeta()->publiclyVisible()->with('user')
             ->where(fn ($q) => $q->whereNotNull('rating')->orWhereNotNull('comment'))->latest()->paginate(12);
 

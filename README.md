@@ -196,6 +196,10 @@ ANIME_CATALOG_BASE_URL=https://api.tenrai.org/v1
 
 Os identificadores MyAnimeList são preservados na importação. A busca externa depende da disponibilidade do provedor; os testes automatizados desse fluxo utilizam respostas simuladas.
 
+Animes importados logo após uma busca já recebem nomes alternativos, datas e demais detalhes, sem nova chamada à API. Os demais entram em uma fila, processada em **Admin → Completar dados** com a página aberta: um anime por requisição, sem depender de worker ou cron, podendo pausar e retomar a qualquer momento. Títulos, sinopses e capas já cadastrados não são substituídos; apenas campos vazios são preenchidos.
+
+`ANIME_CATALOG_SYNC_INTERVAL` define os segundos entre leituras (padrão: 2, ou 30 por minuto). As fontes públicas sobre o limite da Tenrai divergem entre 60 e 120 requisições por minuto, por IP, então o padrão fica na metade do menor valor. Ao receber HTTP 429, a aplicação respeita `Retry-After` e suspende a fila.
+
 ## Testes e qualidade
 
 Execute as verificações de backend, estilo e build:
@@ -232,7 +236,7 @@ O benchmark usa SQLite em memória. Metodologia, resultados e limites estão doc
 - Configure banco, e-mail e serviços conforme o ambiente.
 - Preserve a chave da aplicação e mantenha backups antes de atualizações.
 - Disponibilize escrita em `storage/` e `bootstrap/cache/` e configure o vínculo de storage público.
-- Instale as dependências, compile os assets e aplique as migrations com `php artisan migrate --force`.
+- Instale as dependências, compile os assets e aplique as migrations com `php artisan migrate --force`. Aplique as migrations antes de publicar o código novo: as que só acrescentam colunas e tabelas são compatíveis com a versão anterior.
 - Caso utilize tarefas em fila, mantenha um worker supervisionado em execução.
 
 ## Contribuições
